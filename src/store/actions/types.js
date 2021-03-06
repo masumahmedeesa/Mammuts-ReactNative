@@ -1,0 +1,26 @@
+export const SET_USER = "SET_USER"
+export const USER_ERROR = "USER_ERROR"
+export const UPDATE_USER = "UPDATE_USER"
+export const SHOW_LOADING = "SHOW_LOADING"
+export const HIDE_LOADING = "HIDE_LOADING"
+
+export const UPLOAD_POST = "UPLOAD_POST"
+export const EDIT_POST = "EDIT_POST"
+export const REMOVE_POST = "REMOVE_POST"
+// export const UPLOAD_FILE = "UPLOAD_FILE"
+export const GET_POST = "GET_POST"
+export const GET_RICORDI = "GET_RICORDI"
+export const POST_ERROR = "POST_ERROR"
+
+export const LEGAMI_PERSONAL = "LEGAMI_PERSONAL"
+// export const LEGAMI_ADD = "LEGAMI_ADD"
+export const LEGAMI_REMOVE = "LEGAMI_REMOVE"
+
+export const GET_ALL_USERS = "GET_ALL_USERS"
+export const SEARCH_ERROR = "SEARCH_ERROR"
+export const AUDIO_FORM_DATA = "AUDIO_FORM_DATA"
+export const REMOVE_AUDIO = "REMOVE_AUDIO"
+
+export const LOAD_COMMENTS = "LOAD_COMMENTS"
+export const DELETE_COMMENT = "DELETE_COMMENT"
+export const UPLOAD_COMMENT = "UPLOAD_COMMENT"
