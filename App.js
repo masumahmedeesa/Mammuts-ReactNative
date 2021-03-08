@@ -1,6 +1,5 @@
 import React from 'react'
 import SplashScreen from 'react-native-splash-screen'
-// import {View, ActivityIndicator, StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native'
 import {createDrawerNavigator} from '@react-navigation/drawer'
 import {connect} from 'react-redux'
@@ -9,16 +8,13 @@ import ScreenManager from './src/screens/ScreenManager'
 import {DrawerContent} from './src/components/DrawerContent'
 
 import SettingStackScreen from './src/screens/StackScreen/SettingStack'
-import TermStackScreen from './src/screens/StackScreen/TermsStack'
-import CopyrightStackScreen from './src/screens/StackScreen/CopyrightStack'
-import PrivacyStackScreen from './src/screens/StackScreen/PrivacyStack'
 
 import RootStackScreen from './src/screens/RootStackScreen'
 
 const Drawer = createDrawerNavigator()
 
 class App extends React.Component {
-  componentDidMount(){
+  componentDidMount() {
     SplashScreen.hide()
   }
 
@@ -33,12 +29,6 @@ class App extends React.Component {
               drawerContent={(props) => <DrawerContent {...props} />}>
               <Drawer.Screen name="HomeDrawer" component={ScreenManager} />
               <Drawer.Screen name="Setting" component={SettingStackScreen} />
-              <Drawer.Screen name="Terms" component={TermStackScreen} />
-              <Drawer.Screen name="Privacy" component={PrivacyStackScreen} />
-              <Drawer.Screen
-                name="CopyRight"
-                component={CopyrightStackScreen}
-              />
             </Drawer.Navigator>
           ) : (
             <RootStackScreen />

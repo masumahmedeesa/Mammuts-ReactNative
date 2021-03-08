@@ -4,23 +4,19 @@ import {
   View,
   StatusBar,
   ScrollView,
-  Image,
   TouchableHighlight,
   Dimensions,
   Switch,
   Alert,
   TextInput,
   TouchableOpacity,
-  RefreshControl,
-  // Platform,
-  // ToastAndroid,
-  // AlertIOS
 } from 'react-native'
 import {connect} from 'react-redux'
 import {useNavigation} from '@react-navigation/native'
 import Icon from 'react-native-vector-icons/Feather'
 import Toast from 'react-native-simple-toast'
 import Axios from 'axios'
+import ImageGod from '../../components/ImageGod'
 import {URLS} from '../../config/urls'
 import {showLoading, hideLoading} from '../../store/actions/supportActions'
 import {removeAudio} from '../../store/actions/audioActions'
@@ -28,6 +24,7 @@ import {
   loadComments,
   uploadComment,
   removeComment,
+  refreshComment
 } from '../../store/actions/commentActions'
 import {postDelete} from '../../store/actions/postActions'
 import SoundPlayer from '../profile/SoundPlayer'
@@ -41,6 +38,7 @@ class StoryScreen extends React.Component {
       isEnable: this.props.route.params.data.privato == 0 ? false : true,
       commento: '',
     }
+    // console.log(this.props.route.params.data.privato)
   }
 
   componentDidMount() {
@@ -50,6 +48,13 @@ class StoryScreen extends React.Component {
       this.props.removeAudio()
     }
     this.loadMoreComments()
+    this.props.hideLoading()
+  }
+
+  componentWillUnmount(){
+    // console.log('unmount')
+    this.props.showLoading()
+    this.props.refreshComment()
     this.props.hideLoading()
   }
 
@@ -80,8 +85,11 @@ class StoryScreen extends React.Component {
   }
 
   commentSection = () => {
-    const {comments, user} = this.props
-    const parsedUser = JSON.parse(user)
+    const {comments, otherLevel, navigation} = this.props
+    const {user, sender} = this.props.route.params
+    const parsedUser = user
+    const parsedLevel = JSON.parse(otherLevel)
+
     if (comments.length > 0) {
       const dataa = comments.map((single) => {
         const dd = toString(single.data_inserimento) + single.id
@@ -96,15 +104,15 @@ class StoryScreen extends React.Component {
           <View key={dd} style={[styles.cardW, {marginTop: 5}]}>
             <View style={{flex: 1, flexDirection: 'row'}}>
               <View style={{flex: 1, paddingRight: 5}}>
-                <Image
-                  source={
+                <ImageGod
+                  propWidth={'100%'}
+                  propHeight={45}
+                  imageUrl={
                     single.user.image_profile
-                      ? {uri: 'https://mammuts.it/' + single.user.image_profile}
-                      : require('../../../assets/images/cat.jpeg')
+                      ? 'https://mammuts.it/' + single.user.image_profile
+                      : 'https://mammuts.it/upload/profile/logo_mammuts.png'
                   }
-                  // onLoadStart={() => this.props.showLoading()}
-                  // onLoadEnd={() => this.props.hideLoading()}
-                  style={{width: '100%', height: 45, borderRadius: 50}}
+                  borderRadius={50}
                 />
               </View>
               <View
@@ -121,26 +129,51 @@ class StoryScreen extends React.Component {
                     justifyContent: 'space-between',
                   }}>
                   <View style={{flexDirection: 'row', padding: 1}}>
-                    <Text
-                      style={{
-                        fontSize: 17,
-                        color: 'rgb(0,184,249)',
-                        fontWeight: '500',
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (parsedLevel.id == single.user.id) {
+                          navigation.navigate('Profile')
+                        } else if (user.id == single.user.id) {
+                          navigation.goBack()
+                        } else {
+                          // sender
+                          if (sender === 'Individual') {
+                            navigation.navigate('Other', {
+                              user: single.user,
+                            })
+                          } else {
+                            navigation.navigate('Individual', {
+                              user: single.user,
+                            })
+                          }
+                          // else if (sender === 'Individual') {
+                          //   navigation.navigate('Other', {
+                          //     user: single.user,
+                          //   })
+                          // }
+                        }
                       }}>
-                      {single.user.nome + ' ' + single.user.cognome}
-                    </Text>
+                      <Text
+                        style={{
+                          fontSize: 17,
+                          color: 'rgb(0,184,249)',
+                          // fontWeight: '500',
+                        }}>
+                        {single.user.nome + ' ' + single.user.cognome}
+                      </Text>
+                    </TouchableOpacity>
                     <Text
                       style={{
                         color: 'silver',
                         marginTop: 5,
                         marginLeft: 5,
-                        fontSize: 11,
+                        fontSize: 12,
                       }}>
                       {single.data_inserimento}
                     </Text>
                   </View>
-                  {parsedUser.nome === single.user.nome &&
-                    parsedUser.cognome === single.user.cognome && (
+                  {parsedLevel.nome === single.user.nome &&
+                    parsedLevel.cognome === single.user.cognome && (
                       <TouchableOpacity
                         onPress={() => this.deleteCommentFromDb(single.id)}>
                         <Icon
@@ -153,7 +186,7 @@ class StoryScreen extends React.Component {
                 </View>
                 <View style={{padding: 3}}>
                   {single.testo ? (
-                    <Text style={{color: '#fff', fontSize: 12}}>
+                    <Text style={{color: '#fff', fontSize: 14}}>
                       {single.testo}
                     </Text>
                   ) : single.audio ? (
@@ -194,8 +227,24 @@ class StoryScreen extends React.Component {
             <View
               key={dd}
               // animation="bounceIn"
-              style={{alignItems: 'center'}}>
-              <Image
+              style={{
+                alignItems: 'center',
+                backgroundColor: '#323232',
+                borderRadius: 10,
+                height: screenHeight * 0.4,
+                marginBottom: 3,
+              }}>
+              <ImageGod
+                propWidth={screenWidth}
+                propHeight={screenHeight * 0.4}
+                imageUrl={
+                  single
+                    ? single
+                    : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                }
+                borderRadius={0}
+              />
+              {/* <Image
                 style={{
                   width: screenWidth * 0.94,
                   height: screenHeight * 0.35,
@@ -205,8 +254,8 @@ class StoryScreen extends React.Component {
                 resizeMode="cover"
                 // onLoadStart={() => this.props.showLoading()}
                 // onLoadEnd={() => this.props.hideLoading()}
-              />
-              <View style={{paddingBottom: 8}} />
+              /> */}
+              <View style={{paddingBottom: 10}} />
             </View>
           )
         })}
@@ -231,17 +280,18 @@ class StoryScreen extends React.Component {
     }
     if (swh.data_inserimento) {
       this.setState({isEnable: !this.state.isEnable})
-      Toast.show('La privacy è cambiata :)')
+      Toast.show('La privacy è cambiata :)', Toast.LONG)
     } else {
       this.props.hideLoading()
-      Toast.show('Nessuna connessione internet.')
+      Toast.show('Nessuna connessione internet :(', Toast.LONG)
     }
     this.props.hideLoading()
   }
 
   renderBondNames = () => {
-    const {data} = this.props.route.params
-    const {navigation} = this.props
+    const {data, sender, user} = this.props.route.params
+    const {navigation, otherLevel} = this.props
+    const parsedLevel = JSON.parse(otherLevel)
     const {bondnames} = data
     return (
       <View>
@@ -251,11 +301,33 @@ class StoryScreen extends React.Component {
             <View key={dd} style={{flexDirection: 'row'}}>
               <TouchableOpacity
                 style={{paddingLeft: 5}}
-                onPress={() => navigation.navigate('Profile')}>
+                onPress={() => {
+                  if (parsedLevel.id == single.id) {
+                    navigation.navigate('Profile')
+                  } else if (user.id == single.id) {
+                    navigation.goBack()
+                  } else {
+                    // sender
+                    if (sender === 'Individual') {
+                      navigation.navigate('Other', {
+                        user: single,
+                      })
+                    } else {
+                      navigation.navigate('Individual', {
+                        user: single,
+                      })
+                    }
+                    // else if (sender === 'Individual') {
+                    //   navigation.navigate('Other', {
+                    //     user: single,
+                    //   })
+                    // }
+                  }
+                }}>
                 <Text
                   style={{
                     fontSize: 15,
-                    fontWeight: '500',
+                    fontWeight: '400',
                     color: 'rgb(0,184,249)',
                   }}>
                   {single ? single.nome + ' ' + single.cognome : 'Nobody'}
@@ -299,10 +371,10 @@ class StoryScreen extends React.Component {
     }
     this.setState({commento: ''})
     if (ct.testo) {
-      Toast.show('Il commento è stato caricato con successo.')
+      Toast.show('Il commento è stato caricato con successo.', Toast.LONG)
     } else {
       this.props.hideLoading()
-      Toast.show('Error uploading.')
+      Toast.show('Errore di connessione a Internet.', Toast.LONG)
     }
     this.props.hideLoading()
   }
@@ -335,13 +407,14 @@ class StoryScreen extends React.Component {
       )
     } else {
       this.props.hideLoading()
-      Toast.show('Error uploading')
+      Toast.show('Errore di connessione a Internet :(', Toast.LONG)
     }
     this.props.hideLoading()
   }
 
   removeWholePost = (id) => {
     const {navigation} = this.props
+    const {sender} = this.props.route.params
     Alert.alert(
       'Warning!',
       'Sei sicuro di cancellare questa memoria?',
@@ -354,9 +427,10 @@ class StoryScreen extends React.Component {
             this.props.postDelete(id)
             this.props.hideLoading()
             // setTimeout(()=>{
-            navigation.navigate('Profile')
+
+            navigation.navigate(sender ? sender : 'Profile')
             // },800)
-            Toast.show('Memory has been deleted successfully!', Toast.LONG)
+            Toast.show('La memoria è stata cancellata con successo!', Toast.LONG)
           },
         },
       ],
@@ -366,8 +440,8 @@ class StoryScreen extends React.Component {
 
   render() {
     const {isEnable, commento} = this.state
-    const {user, navigation } = this.props
-    const {data, images} = this.props.route.params
+    const {navigation, otherLevel} = this.props
+    const {data, images, sender, user} = this.props.route.params
     const {
       id,
       name,
@@ -376,10 +450,14 @@ class StoryScreen extends React.Component {
       soundInfo,
       soundIsExist,
       tags,
+      ownerInfo,
       bondnames,
+      ownerId,
     } = data
-    const parsedUser = JSON.parse(user)
-
+    const parsedUser = user
+    // console.log(parsedUser, 'Story')
+    const parsedLevel = JSON.parse(otherLevel)
+    // console.log(parsedUser,'story----')
     return (
       <View style={{flex: 1, backgroundColor: '#000000'}}>
         <StatusBar barStyle="light-content" />
@@ -388,9 +466,9 @@ class StoryScreen extends React.Component {
             <View style={{flexDirection: 'row', paddingLeft: 12}}>
               <Text
                 style={{
-                  fontSize: 14,
-                  color: 'white',
-                  fontWeight: '500',
+                  fontSize: 15,
+                  color: 'silver',
+                  fontWeight: '400',
                   paddingBottom: 7,
                 }}>
                 Presenti nel ricordo
@@ -399,11 +477,12 @@ class StoryScreen extends React.Component {
               {bondnames === 'Logged user' ? (
                 <TouchableOpacity
                   style={{paddingLeft: 5}}
-                  onPress={() => navigation.navigate('Profile')}>
+                  // onPress={() => navigation.navigate('Profile')}
+                >
                   <Text
                     style={{
-                      fontSize: 14,
-                      fontWeight: '500',
+                      fontSize: 16,
+                      fontWeight: '400',
                       color: 'rgb(0,184,249)',
                     }}>
                     {parsedUser.nome + ' ' + parsedUser.cognome}
@@ -417,61 +496,150 @@ class StoryScreen extends React.Component {
 
           <View style={{paddingBottom: 8}} />
 
-          <View style={styles.firstColumn}>
-            <View style={{paddingLeft: 4}}>
-              <Text style={{fontSize: 16, fontWeight: '600', color: 'white'}}>
-                {published}
-              </Text>
-            </View>
-
-            <View style={{flexDirection: 'row'}}>
-              <TouchableHighlight
-                onPress={() => {
-                  navigation.navigate('EditMeme', {
-                    images: images,
-                    data: data,
-                    // soundInfo: soundInfo,
-                  })
-                }}>
-                <Icon
-                  name="edit"
-                  color="silver"
-                  style={{fontSize: 20, paddingRight: 10}}
-                />
-              </TouchableHighlight>
-
-              <TouchableHighlight
-                onPress={() => {
-                  this.removeWholePost(id)
-                }}>
-                <Icon name="trash-2" color="hotpink" style={{fontSize: 20}} />
-              </TouchableHighlight>
-            </View>
-          </View>
-
-          <View style={{paddingLeft: 14, paddingTop: 12, flex: 1}}>
-            <View style={{flexDirection: 'row'}}>
-              <Icon
-                name="map-pin"
-                color="rgb(0,184,249)"
-                style={{fontSize: 20}}
-              />
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontWeight: '600',
-                  color: 'silver',
-                  marginLeft: 5,
-                }}>
-                {name}
-              </Text>
-            </View>
-          </View>
           <View
-            style={{paddingLeft: 14, paddingTop: 7, paddingRight: 6, flex: 1}}>
-            <Text style={{fontSize: 16, fontWeight: '600', color: 'silver'}}>
-              {description}
-            </Text>
+            style={{
+              flex: 1,
+              paddingLeft: 12,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+            <View style={{flexDirection: 'row'}}>
+              {parsedUser && parsedUser.id == ownerId ? (
+                <ImageGod
+                  propWidth={35}
+                  propHeight={35}
+                  imageUrl={
+                    parsedUser.image_profile
+                      ? 'https://mammuts.it/' + parsedUser.image_profile
+                      : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                  }
+                  borderRadius={50}
+                />
+              ) : (
+                <ImageGod
+                  propWidth={35}
+                  propHeight={35}
+                  imageUrl={
+                    ownerInfo.image_profile
+                      ? 'https://mammuts.it/' + ownerInfo.image_profile
+                      : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                  }
+                  borderRadius={50}
+                />
+              )}
+              <View>
+                {parsedUser.id == ownerId ? (
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: 'rgb(0,184,249)',
+                      fontWeight: '400',
+                      paddingLeft: 6,
+                    }}>
+                    Ricordo personale
+                  </Text>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (parsedLevel.id == ownerId) {
+                        navigation.navigate('Profile')
+                      } else if (user.id == ownerId) {
+                        navigation.goBack()
+                      } else {
+                        // sender
+                        if (sender === 'Individual') {
+                          navigation.navigate('Other', {
+                            user: ownerInfo,
+                          })
+                        } else {
+                          navigation.navigate('Individual', {
+                            user: ownerInfo,
+                          })
+                        }
+                      }
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        color: 'rgb(0,184,249)',
+                        fontWeight: '400',
+                        paddingLeft: 6,
+                        // paddingTop: 6,
+                      }}>
+                      {ownerInfo.nome && 'Ricordo di ' + ownerInfo.nome}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                <Text
+                  style={{
+                    fontSize: 12,
+                    // fontWeight: '600',
+                    color: 'silver',
+                    paddingLeft: 6,
+                  }}>
+                  Pubblicato {published}
+                </Text>
+              </View>
+            </View>
+
+            {ownerId == parsedLevel.id && parsedLevel.id == parsedUser.id && (
+              <View style={{flexDirection: 'row', paddingRight: 10}}>
+                <TouchableHighlight
+                  onPress={() => {
+                    navigation.navigate('EditMeme', {
+                      images: images,
+                      data: data,
+                      sender: sender ? sender : 'Profile',
+                      // soundInfo: soundInfo,
+                    })
+                  }}>
+                  <Icon
+                    name="edit"
+                    color="silver"
+                    style={{fontSize: 20, paddingRight: 10}}
+                  />
+                </TouchableHighlight>
+
+                <TouchableHighlight
+                  onPress={() => {
+                    this.removeWholePost(id)
+                  }}>
+                  <Icon name="trash-2" color="hotpink" style={{fontSize: 20}} />
+                </TouchableHighlight>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.firstColumn}>
+            <View style={{paddingLeft: 4, marginTop: 5}}>
+              <View style={{flexDirection: 'row'}}>
+                <Icon
+                  name="map-pin"
+                  color="rgb(0,184,249)"
+                  style={{fontSize: 19}}
+                />
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: 'white',
+                    marginLeft: 5,
+                  }}>
+                  {name}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <View
+            style={{
+              paddingLeft: 14,
+              paddingTop: 7,
+              paddingRight: 6,
+              paddingBottom: 8,
+              flex: 1,
+            }}>
+            <Text style={{fontSize: 16, color: 'white'}}>{description}</Text>
           </View>
 
           {soundIsExist.length > 0 ? (
@@ -561,7 +729,7 @@ class StoryScreen extends React.Component {
               onPress={this.uploadTextAsComment}>
               <Icon
                 name="send"
-                style={{fontSize: 24, fontWeight: '500', color: 'silver'}}
+                style={{fontSize: 24, fontWeight: '400', color: 'silver'}}
               />
             </TouchableHighlight>
           </View>
@@ -590,12 +758,12 @@ class StoryScreen extends React.Component {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                <Text style={{fontSize: 20, color: 'white'}}>
+                <Text style={{fontSize: 18, color: 'white'}}>
                   Oppure registra iun audio
                 </Text>
                 <Icon
                   name="mic"
-                  style={{fontSize: 35, padding: 5, color: 'white'}}
+                  style={{fontSize: 30, padding: 5, color: 'white'}}
                 />
               </View>
             </View>
@@ -610,7 +778,7 @@ class StoryScreen extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    user: state.auth.user,
+    otherLevel: state.auth.user,
     audio: state.audio,
     comments: state.comments.comments,
   }
@@ -627,60 +795,9 @@ export default connect(mapStateToProps, {
   loadComments,
   uploadComment,
   removeComment,
+  refreshComment,
   postDelete,
 })(StoryScreenFunction)
-
-// {ch == 'cat' ? (
-//   <Image
-//     style={{
-//       width: screenWidth * 0.94,
-//       height: screenHeight * 0.2,
-//       borderRadius: 10,
-//     }}
-//     source={require('../../../assets/images/cat.jpeg')}
-//     resizeMode="cover"
-//   />
-// ) : ch == 'cat1' ? (
-//   <Image
-//     style={{
-//       width: screenWidth * 0.94,
-//       height: screenHeight * 0.2,
-//       borderRadius: 10,
-//     }}
-//     source={require('../../../assets/images/cat1.jpg')}
-//     resizeMode="cover"
-//   />
-// ) : ch == 'cat2' ? (
-//   <Image
-//     style={{
-//       width: screenWidth * 0.94,
-//       height: screenHeight * 0.2,
-//       borderRadius: 10,
-//     }}
-//     source={require('../../../assets/images/cat2.jpg')}
-//     resizeMode="cover"
-//   />
-// ) : ch == 'cat3' ? (
-//   <Image
-//     style={{
-//       width: screenWidth * 0.94,
-//       height: screenHeight * 0.2,
-//       borderRadius: 10,
-//     }}
-//     source={require('../../../assets/images/cat3.jpg')}
-//     resizeMode="cover"
-//   />
-// ) : ch == 'cat4' ? (
-//   <Image
-//     style={{
-//       width: screenWidth * 0.94,
-//       height: screenHeight * 0.2,
-//       borderRadius: 10,
-//     }}
-//     source={require('../../../assets/images/cat4.jpg')}
-//     resizeMode="cover"
-//   />
-// ) : null}
 
 /* <Animatable.View
 key={dd}

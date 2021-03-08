@@ -11,9 +11,9 @@ export const URLS = {
 
   RICORDI: PREFIX + 'ricordo',
   STORIES: PREFIX + 'storiesPerson/',
-  FIRST_PICTURES: PREFIX + 'ricordiShowing/',
+  STORIES_OTHER: PREFIX + 'storiesPersonOther/',
 
-  LEGAMI_PERSONAL: PREFIX + 'legami',
+  LEGAMI_PERSONAL: PREFIX + 'legami/',
   ALLUSERS: PREFIX + 'allusers',
   LEGAMI_ADD_REMOVE: PREFIX + "legamiAR",
 

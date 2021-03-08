@@ -1,77 +1,46 @@
-import React, {useRef} from 'react'
-import {
-  Text,
-  View,
-  Button,
-  StatusBar,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-  Alert,
-  Platform,
-  StyleSheet,
-  FlatList,
-  ActivityIndicator,
-} from 'react-native'
+import React from 'react'
+import {Text, View, StatusBar, TouchableOpacity, ScrollView} from 'react-native'
 import {useNavigation} from '@react-navigation/native'
 import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/Feather'
 import * as Animatable from 'react-native-animatable'
 
-import {ricodioActions} from '../../store/actions/postActions'
+import {ricodioActions, legamiCollection} from '../../store/actions/postActions'
 import {showLoading, hideLoading} from '../../store/actions/supportActions'
-// import styles from './styles'
-// import SinglePlayer from '../profile/SinglePlayer'
-// import SoundPlayer from '../profile/SoundPlayer'
+import styles from './styles'
 
-// var mediaInfo1 = {
-//   id: '1',
-//   url:
-//     'http://mammuts.it/vocal/audio/YyJYCY53KWyPfELvqoJkkHmoyqSSPSFb5PLWvzaA.aac',
-//   title: 'Pure',
-//   artist: 'David Chavez',
-//   duration: 28,
-// }
-
-// const audioTests = {
-//   title: 'wav remote download',
-//   url:
-//     'http://mammuts.it/vocal/audio/YyJYCY53KWyPfELvqoJkkHmoyqSSPSFb5PLWvzaA.aac',
-// }
 
 class HomeScreen extends React.Component {
   componentDidMount() {
     const user = JSON.parse(this.props.auth.user)
     this.props.showLoading()
     if (user) {
-      this.props.ricodioActions(user.id, 1)
+      this.props.legamiCollection(user.id)
+      this.props.ricodioActions(user.id, 1, user)
     }
     this.props.hideLoading()
   }
 
   render() {
+    const user = JSON.parse(this.props.auth.user)
+    const {navigation} = this.props
     return (
       <View style={{flex: 1, backgroundColor: '#000000'}}>
         <StatusBar backgroundColor="#000000" barStyle="light-content" />
-
-        <View style={styles.search}>
-          <TouchableOpacity style={styles.searchBtn} onPress={() => {}}>
+        <TouchableOpacity
+          style={styles.search}
+          onPress={() => navigation.navigate('Search')}>
+          <View style={styles.searchBtn}>
             <Icon
               name="search"
               type="FontAwesome"
               style={styles.searchBtnIcon}
             />
-          </TouchableOpacity>
-          <TextInput
-            placeholder={'Cerca un legame'}
-            placeholderTextColor="grey"
-            returnKeyType="go"
-            style={styles.textInput}
-            // value={this.state.query}
-            // onChangeText={}
-            onSubmitEditing={() => {}}
-          />
-        </View>
+          </View>
+          <Text style={[styles.textInput, {color: 'grey'}]}>
+            Cerca un legame
+          </Text>
+        </TouchableOpacity>
 
         <ScrollView style={styles.container}>
           <Animatable.View
@@ -80,7 +49,7 @@ class HomeScreen extends React.Component {
             style={styles.cardStylish}>
             <Text
               style={[styles.textStylish, {fontSize: 20, textAlign: 'center'}]}>
-              Ciao Utente, Benvenuto In Mammuts
+              Ciao {user.nome} {user.cognome}, Benvenuto In Mammuts
             </Text>
           </Animatable.View>
           <View style={[styles.card, {marginTop: 10}]}>
@@ -94,38 +63,6 @@ class HomeScreen extends React.Component {
               al Mammut, l'uomo di oggi, descrive la propria vita con foto e
               audio Trova un tuo legame Cerca
             </Text>
-          </View>
-
-          <View
-            style={{
-              marginTop: 10,
-              flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              // backgroundColor: '#323232',
-              borderRadius: 8,
-            }}>
-            <TextInput
-              placeholder={'Trova un tuo legame'}
-              placeholderTextColor="grey"
-              returnKeyType="go"
-              style={styles.textInputW}
-              onSubmitEditing={() => {}}
-            />
-            <TouchableOpacity
-              style={{
-                backgroundColor: 'rgb(0,184,249)',
-                alignItems: 'center',
-                justifyContent: 'center',
-                // padding: 2,
-                flex: Platform.OS == 'ios' ? 1.3 : 1,
-                borderRadius: 8,
-              }}
-              onPress={() => {
-                Alert.alert('Search', 'Will Search :)', [{text: 'Okay'}])
-              }}>
-              <Text style={{fontSize: 16, fontWeight: '600'}}>Cerca</Text>
-            </TouchableOpacity>
           </View>
 
           <View
@@ -227,7 +164,7 @@ class HomeScreen extends React.Component {
             </Text>
           </View>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{
               marginTop: 30,
             }}
@@ -251,8 +188,8 @@ class HomeScreen extends React.Component {
                 Aggiungi dei legami o crea dei ricordi
               </Text>
             </View>
-          </TouchableOpacity>
-          <View style={{marginTop: 25, marginBottom: 40}}>
+          </TouchableOpacity> */}
+          {/* <View style={{marginTop: 25, marginBottom: 40}}>
             <View style={[styles.card, {}]}>
               <Text
                 style={[styles.textStyle, {fontSize: 17, fontWeight: '600'}]}>
@@ -274,7 +211,7 @@ class HomeScreen extends React.Component {
                 If ties have, more
               </Text>
             </View>
-          </View>
+          </View> */}
         </ScrollView>
       </View>
     )
@@ -296,4 +233,5 @@ export default connect(mapStateToProps, {
   ricodioActions,
   showLoading,
   hideLoading,
+  legamiCollection
 })(HomeScreenFunction)

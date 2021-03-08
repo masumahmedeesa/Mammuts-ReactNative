@@ -3,22 +3,18 @@ import {
   Text,
   View,
   ScrollView,
-  Dimensions,
   TouchableOpacity,
   TextInput,
-  TouchableHighlight,
-  Image,
   Alert,
+  RefreshControl,
 } from 'react-native'
 import Icon from 'react-native-vector-icons/Feather'
 import {useNavigation} from '@react-navigation/native'
 import {connect} from 'react-redux'
-import * as Animatable from 'react-native-animatable'
-// import Pictures from '../../model/pictures'
-import {getAllUsers} from '../../store/actions/searchActions'
-import {legamiCollection, legamiAddorRemove} from '../../store/actions/postActions'
+import ImageGod from '../../components/ImageGod'
+import {getAllUsers, refreshUsers} from '../../store/actions/searchActions'
+import {legamiAddorRemove} from '../../store/actions/postActions'
 import {showLoading, hideLoading} from '../../store/actions/supportActions'
-
 import styles from './styles'
 
 class SearchScreenClass extends React.Component {
@@ -26,19 +22,24 @@ class SearchScreenClass extends React.Component {
     super(props)
     this.state = {
       item: '',
+      refreshing: false,
     }
   }
 
   componentDidMount() {
     this.props.showLoading()
-    const user = JSON.parse(this.props.user)
-    if (user) {
-      this.props.legamiCollection(user.cf_key)
-    }
     this.props.getAllUsers()
     this.props.hideLoading()
   }
 
+  handleRefresh = () => {
+    // this.setState({refreshing: true})
+    this.props.showLoading()
+    this.props.refreshUsers()
+    this.props.getAllUsers()
+    this.props.hideLoading()
+    // this.setState({refreshing: false})
+  }
   SearchAl = (value) => (
     <View
       style={{
@@ -57,6 +58,7 @@ class SearchScreenClass extends React.Component {
   }
 
   renderFilteredusers = () => {
+    const {legamies, navigation} = this.props
     const {item} = this.state
     const filteredUsers = this.findUser(item)
     if (filteredUsers.length > 0) {
@@ -72,9 +74,7 @@ class SearchScreenClass extends React.Component {
                 return (
                   <TouchableOpacity
                     key={dd}
-                    onPress={() =>
-                      this.removeLegami(single.cf_key)
-                    }
+                    onPress={() => this.removeLegami(single.cf_key)}
                     style={styles.addBoxRed}>
                     <Text style={styles.addTextRed}>Rimuovere</Text>
                   </TouchableOpacity>
@@ -88,26 +88,27 @@ class SearchScreenClass extends React.Component {
                   style={{flex: 8}}>
                   <View style={{flexDirection: 'row'}}>
                     <View style={{flex: 1, paddingRight: 5}}>
-                      {image_profile ? (
-                        <Image
-                          source={{uri: 'https://mammuts.it/' + image_profile}}
-                          style={{width: '100%', height: 45, borderRadius: 50}}
-                          onLoadStart={() => this.props.showLoading()}
-                          onLoadEnd={() => this.props.hideLoading()}
-                        />
-                      ) : (
-                        <Image
-                          source={require('../../../assets/images/cat.jpeg')}
-                          style={{width: '100%', height: 45, borderRadius: 50}}
-                        />
-                      )}
+                      <ImageGod
+                        propWidth={45}
+                        propHeight={45}
+                        imageUrl={
+                          image_profile
+                            ? 'https://mammuts.it/' + image_profile
+                            : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                        }
+                        borderRadius={50}
+                      />
                     </View>
-                    <View style={{flex: 6, paddingTop: 3}}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate('Individual', {user: single})
+                      }
+                      style={{flex: 6, paddingTop: 3, paddingLeft: 4}}>
                       <Text style={styles.normalText}>
                         {nome + ' ' + cognome}
                       </Text>
                       <Text style={styles.normalText}>{email}</Text>
-                    </View>
+                    </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
 
@@ -115,9 +116,7 @@ class SearchScreenClass extends React.Component {
                   legamiView
                 ) : (
                   <TouchableOpacity
-                    onPress={() =>
-                      this.addLegami(single.cf_key)
-                    }
+                    onPress={() => this.addLegami(single.cf_key)}
                     style={styles.addBox}>
                     <Text style={styles.addText}>Aggiungi</Text>
                   </TouchableOpacity>
@@ -142,7 +141,7 @@ class SearchScreenClass extends React.Component {
           text: 'OK',
           onPress: () => {
             this.props.showLoading()
-            this.props.legamiAddorRemove({cfKey: cfKey, bb: "add"})
+            this.props.legamiAddorRemove({cfKey: cfKey, bb: 'add'})
             this.props.hideLoading()
           },
         },
@@ -161,7 +160,7 @@ class SearchScreenClass extends React.Component {
           text: 'OK',
           onPress: () => {
             this.props.showLoading()
-            this.props.legamiAddorRemove({cfKey: cfKey, bb: "remove"})
+            this.props.legamiAddorRemove({cfKey: cfKey, bb: 'remove'})
             this.props.hideLoading()
           },
         },
@@ -171,7 +170,7 @@ class SearchScreenClass extends React.Component {
   }
 
   renderUsers = () => {
-    const {allusers, legamies} = this.props
+    const {allusers, legamies, navigation} = this.props
     // console.log(legamies)
     if (allusers.length > 0) {
       return (
@@ -186,9 +185,7 @@ class SearchScreenClass extends React.Component {
                 return (
                   <TouchableOpacity
                     key={dd}
-                    onPress={() =>
-                      this.removeLegami(single.cf_key)
-                    }
+                    onPress={() => this.removeLegami(single.cf_key)}
                     style={styles.addBoxRed}>
                     <Text style={styles.addTextRed}>Rimuovere</Text>
                   </TouchableOpacity>
@@ -202,26 +199,27 @@ class SearchScreenClass extends React.Component {
                   style={{flex: 8}}>
                   <View style={{flexDirection: 'row'}}>
                     <View style={{flex: 1, paddingRight: 5}}>
-                      {image_profile ? (
-                        <Image
-                          source={{uri: 'https://mammuts.it/' + image_profile}}
-                          style={{width: '100%', height: 45, borderRadius: 50}}
-                          onLoadStart={() => this.props.showLoading()}
-                          onLoadEnd={() => this.props.hideLoading()}
-                        />
-                      ) : (
-                        <Image
-                          source={require('../../../assets/images/cat.jpeg')}
-                          style={{width: '100%', height: 45, borderRadius: 50}}
-                        />
-                      )}
+                      <ImageGod
+                        propWidth={45}
+                        propHeight={45}
+                        imageUrl={
+                          image_profile
+                            ? 'https://mammuts.it/' + image_profile
+                            : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                        }
+                        borderRadius={50}
+                      />
                     </View>
-                    <View style={{flex: 6, paddingTop: 3}}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate('Individual', {user: single})
+                      }
+                      style={{flex: 6, paddingTop: 2}}>
                       <Text style={styles.normalText}>
                         {nome + ' ' + cognome}
                       </Text>
                       <Text style={styles.normalText}>{email}</Text>
-                    </View>
+                    </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
 
@@ -229,9 +227,7 @@ class SearchScreenClass extends React.Component {
                   legamiView
                 ) : (
                   <TouchableOpacity
-                    onPress={() =>
-                      this.addLegami(single.cf_key)
-                    }
+                    onPress={() => this.addLegami(single.cf_key)}
                     style={styles.addBox}>
                     <Text style={styles.addText}>Aggiungi</Text>
                   </TouchableOpacity>
@@ -261,6 +257,7 @@ class SearchScreenClass extends React.Component {
 
   render() {
     const {item} = this.state
+    // console.log(this.state.refreshing)
     // const filteredUsers = this.findUser(item)
 
     return (
@@ -297,26 +294,19 @@ class SearchScreenClass extends React.Component {
           </View>
 
           <View style={{marginTop: 5}} />
-          <ScrollView style={{padding: 8}}>
+          <ScrollView
+            style={{padding: 8}}
+            refreshControl={
+              <RefreshControl
+                progressBackgroundColor="cyan"
+                // colors="rgb(0,184,249)"
+                refreshing={this.state.refreshing}
+                onRefresh={this.handleRefresh}
+              />
+            }>
             {this.renderFilteredusers()}
             <View style={{paddingBottom: 20}} />
           </ScrollView>
-
-          {/* <View style={{margin: 5}}>
-            <View style={{flexDirection: 'row'}}>
-              {this.SearchAl('ibrahimovic')}
-              {this.SearchAl('Ronie')}
-              {this.SearchAl('berlin')}
-              {this.SearchAl('Helsilnki')}
-              {this.SearchAl('Denvar')}
-            </View>
-            <View style={{marginTop: 5, flexDirection: 'row'}}>
-              {this.SearchAl('Ronie')}
-              {this.SearchAl('Tokiyo')}
-              {this.SearchAl('Palermo')}
-              {this.SearchAl('Nairobi')}
-            </View>
-          </View> */}
         </View>
 
         <View style={{marginTop: 10}} />
@@ -341,8 +331,8 @@ export default connect(mapStateToProps, {
   getAllUsers,
   showLoading,
   hideLoading,
-  legamiCollection,
-  legamiAddorRemove
+  refreshUsers,
+  legamiAddorRemove,
 })(SearchScreen)
 
 // renderRicordo = (posts, navigation) => {

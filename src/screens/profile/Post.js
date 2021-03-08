@@ -2,19 +2,18 @@ import React from 'react'
 import {
   View,
   Text,
-  ScrollView,
-  FlatList,
   SafeAreaView,
-  TouchableHighlight,
+  TouchableOpacity
 } from 'react-native'
 // import Axios from 'axios'
 // import {Content} from 'native-base'
 import {connect} from 'react-redux'
+import Icon from 'react-native-vector-icons/Feather'
 import EachPost from './EachPost'
 // import {URLS} from '../../config/urls'
 import {ricodioActions} from '../../store/actions/postActions'
 import {showLoading, hideLoading} from '../../store/actions/supportActions'
-import {TouchableOpacity} from 'react-native-gesture-handler'
+// import {TouchableOpacity} from 'react-native-gesture-handler'
 // import localTrack from '../../data/pure.m4a'
 // import localTrack2 from '../../data/test.mp3'
 
@@ -59,9 +58,7 @@ class Post extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      // data: [1],
       page: 1,
-      // isLoading: false,
     }
   }
 
@@ -70,8 +67,8 @@ class Post extends React.Component {
     if (prevState.page !== page) {
       const user = JSON.parse(this.props.user)
       this.props.showLoading()
-      if (user){
-        this.props.ricodioActions(user.id, page)
+      if (user) {
+        this.props.ricodioActions(user.id, page, user)
       }
       this.props.hideLoading()
     }
@@ -81,119 +78,67 @@ class Post extends React.Component {
     this.setState({page: this.state.page + 1})
   }
 
-  dataClassifier(single) {
-    // console.log(single,'dataclassifier')
-    const {user} = this.props
-    const parsedUser = JSON.parse(user)
-    let obj = {}
-    obj['title'] = 'wav remote download'
-    let genjam = single.audio ? single.audio : 'nope'
-    obj['url'] = 'https://mammuts.it/vocal/' + genjam
-    let pictures = []
-    if (single.immagine !== null) {
-      for (let i = 0; i < single.immagine.length; i++) {
-        pictures.push(
-          'https://mammuts.it' +
-            single.immagine[i].substring(2, single.immagine[i].length),
-        )
-      }
-    }
-    let specialCase = ''
-    if (single.ownerInfo) {
-      specialCase = single.ownerInfo
-    }
-    let firstCase = ''
-    if (parsedUser.id != single.id_utente) {
-      firstCase = []
-      firstCase.push(parsedUser.id)
-    }
-
-    let finalData = {}
-    finalData['id'] = single.id
-    finalData['soundInfo'] = obj
-    finalData['soundIsExist'] = single.audio
-    finalData['published'] = single.data_inserimento
-    finalData['name'] = single.luogo
-    finalData['description'] = single.testo
-    finalData['ownerId'] = single.id_utente
-    finalData['privato'] = single.privato
-    finalData['tags'] = firstCase ? firstCase : single.tags
-    finalData['bondnames'] = firstCase ? 'Logged user' : single.bondnames
-    finalData['ownerInfo'] = specialCase
-    finalData['pictures'] = pictures
-    finalData['commentLength'] = single.commentLength
-    finalData['commentUsers'] = single.commentUsers
-    finalData['comments'] = single.comments
-
-    return finalData
-  }
-
   render() {
-    const {navigation, posts} = this.props
-    // console.log(posts.length,'posts')
-    // const parsedUser = JSON.parse(user)
-    // console.log(user)
-    // user = JSON.parse(user)
-    // console.log(parsedUser)
-    // const {data} = this.state
-    // console.log(this.state.page)
-    return (
-      <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
-        {/* <EachPost
-              images=""
-              soundIsExist="okay"
-              soundInfo={audioTests[1]}
-              name="Casarile (mi)"
-              description="Registro audio pubblico foto indico il luogo dove ho scattato foto Posso rendere il post visibile solo a me"
-              published="26/12/2020 17:48"
-              navigation={navigation}
-            /> */}
-          
-        {posts.map((single) => {
-          
-          // 8 miliseconds
-          // console.log(single,'eeeeerrrrr')
-          const finalData = this.dataClassifier(single)
-          const {pictures, id} = finalData
-          let dd = Date.now() + id
-          
-          return (
-            <View key={dd}>
-              <EachPost
-                data={finalData}
-                images={pictures}
-                // soundInfo={obj}
-                // soundIsExist={single.audio}
-                // published={single.data_inserimento}
-                // name={single.luogo}
-                // description={single.testo}
-                // ownerId={single.id_utente}
-                // privato={single.privato}
-                // tags={firstCase ? firstCase : single.tags}
-                // bondnames={firstCase ? 'Logged user' : single.bondnames}
-                // ownerInfo={specialCase}
-                // singlegg={single}
-                navigation={navigation}
-              />
-            </View>
-          )
-        })}
+    const {navigation, posts, user} = this.props
+    if (posts && posts.length > 0) {
+      return (
+        <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
+          {posts.map((single) => {
+            // 8 miliseconds
+            const {pictures, id} = single.data
+            let dd = Date.now() + id
+            return (
+              <View key={dd}>
+                <EachPost
+                  data={single.data}
+                  images={pictures}
+                  user={JSON.parse(user)}
+                  // soundInfo={obj}
+                  // soundIsExist={single.audio}
+                  // published={single.data_inserimento}
+                  // name={single.luogo}
+                  // description={single.testo}
+                  // ownerId={single.id_utente}
+                  // privato={single.privato}
+                  // tags={firstCase ? firstCase : single.tags}
+                  // bondnames={firstCase ? 'Logged user' : single.bondnames}
+                  // ownerInfo={specialCase}
+                  // singlegg={single}
+                  navigation={navigation}
+                />
+              </View>
+            )
+          })}
 
-        <View style={{paddingTop: 8, paddingBottom: 10}}>
-          <TouchableOpacity
-            style={{
-              backgroundColor: 'rgb(0,184,249)',
-              borderRadius: 5,
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: 5,
-            }}
-            onPress={this.ggTT}>
-            <Text style={{color: 'white'}}>LOAD MORE</Text>
-          </TouchableOpacity>
+          {posts && posts.length > 0 && (
+            <View style={{paddingTop: 8, paddingBottom: 10}}>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: 'rgb(0,184,249)',
+                  borderRadius: 5,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: 5,
+                }}
+                onPress={this.ggTT}>
+                <Text style={{color: 'white'}}>LOAD MORE</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </SafeAreaView>
+      )
+    } else {
+      return (
+        <View style={{flex: 1, backgroundColor: '#000000'}}>
+          <View style={{flexDirection: 'row', padding: 20, justifyContent: 'center'}}>
+            <Icon name="frown" color="silver" style={{fontSize: 36}} />
+            <Text style={{color: 'silver', fontSize: 21, paddingLeft: 8}}>
+              Non hai ancora caricato alcun ricordo.
+            </Text>
+          </View>
         </View>
-      </SafeAreaView>
-    )
+      )
+    }
   }
 }
 
@@ -210,6 +155,62 @@ export default connect(mapStateToProps, {
   hideLoading,
   ricodioActions,
 })(Post)
+
+/* <EachPost
+              images=""
+              soundIsExist="okay"
+              soundInfo={audioTests[1]}
+              name="Casarile (mi)"
+              description="Registro audio pubblico foto indico il luogo dove ho scattato foto Posso rendere il post visibile solo a me"
+              published="26/12/2020 17:48"
+              navigation={navigation}
+            /> */
+// dataClassifier(single) {
+//   // console.log(single,'dataclassifier')
+//   const {user} = this.props
+//   const parsedUser = JSON.parse(user)
+//   let obj = {}
+//   obj['title'] = 'wav remote download'
+//   let genjam = single.audio ? single.audio : 'nope'
+//   obj['url'] = 'https://mammuts.it/vocal/' + genjam
+//   let pictures = []
+//   if (single.immagine !== null) {
+//     for (let i = 0; i < single.immagine.length; i++) {
+//       pictures.push(
+//         'https://mammuts.it' +
+//           single.immagine[i].substring(2, single.immagine[i].length),
+//       )
+//     }
+//   }
+//   let specialCase = ''
+//   if (single.ownerInfo) {
+//     specialCase = single.ownerInfo
+//   }
+//   let firstCase = ''
+//   if (parsedUser.id != single.id_utente) {
+//     firstCase = []
+//     firstCase.push(parsedUser.id)
+//   }
+
+//   let finalData = {}
+//   finalData['id'] = single.id
+//   finalData['soundInfo'] = obj
+//   finalData['soundIsExist'] = single.audio
+//   finalData['published'] = single.data_inserimento
+//   finalData['name'] = single.luogo
+//   finalData['description'] = single.testo
+//   finalData['ownerId'] = single.id_utente
+//   finalData['privato'] = single.privato
+//   finalData['tags'] = firstCase ? firstCase : single.tags
+//   finalData['bondnames'] = firstCase ? 'Logged user' : single.bondnames
+//   finalData['ownerInfo'] = specialCase
+//   finalData['pictures'] = pictures
+//   finalData['commentLength'] = single.commentLength
+//   finalData['commentUsers'] = single.commentUsers
+//   finalData['comments'] = single.comments
+
+//   return finalData
+// }
 
 // fetchData = () => {
 //   const {page, data} = this.state
@@ -273,8 +274,7 @@ export default connect(mapStateToProps, {
 //   )
 // }
 
-
-  /* <FlatList
+/* <FlatList
 data={data}
 showsHorizontalScrollIndicator={false}
 renderItem={this.renderItem}
@@ -289,4 +289,3 @@ onEndReached={this.renderPaginate}
 //   </View>
 // )}
 /> */
-

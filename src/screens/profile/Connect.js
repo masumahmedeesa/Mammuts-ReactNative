@@ -1,13 +1,38 @@
 import React from 'react'
-import {View, Text, Image, TouchableOpacity, Alert} from 'react-native'
+import {View, Text, TouchableOpacity, Alert} from 'react-native'
+import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/Feather'
+// import Icon from 'react-native-vector-icons/Feather'
+import {legamiAddorRemove} from '../../store/actions/postActions'
+import {showLoading, hideLoading} from '../../store/actions/supportActions'
+import ImageGod from '../../components/ImageGod'
 import styles from './styles'
 
 class Connect extends React.Component {
+  removeLegami = (cfKey) => {
+    Alert.alert(
+      'AVVERTIMENTO!',
+      'Sei sicuro di eliminare questa cravatta?',
+      [
+        {text: 'Cancel', style: 'cancel'},
+        {
+          text: 'OK',
+          onPress: () => {
+            this.props.showLoading()
+            this.props.legamiAddorRemove({cfKey: cfKey, bb: 'remove'})
+            this.props.hideLoading()
+          },
+        },
+      ],
+      {cancelable: false},
+    )
+  }
+
   renderIndividualPeople = (item) => {
-    // console.log(imageProfile)
     const {nome, cognome, image_profile, email} = item
-    // const {navigation} = this.props
+    const {otherLevel, navigation} = this.props
+    const parsedLevel = JSON.parse(otherLevel)
+
     return (
       <View
         style={{
@@ -16,23 +41,29 @@ class Connect extends React.Component {
           flexDirection: 'row',
         }}>
         <TouchableOpacity
-          // onPress={() => navigation.navigate('Individual', {info: item})}
+          onPress={() => {
+            if (parsedLevel.id == item.id) {
+              // navigation.navigate('Profile')
+            } else {
+              navigation.navigate('Individual', {user: item})
+            }
+          }}
+
           style={{flex: 8}}>
           <View style={{flexDirection: 'row'}}>
             <View style={{flex: 1, paddingRight: 5}}>
-              {image_profile ? (
-                <Image
-                  source={{uri: 'https://mammuts.it/' + image_profile}}
-                  style={{width: '100%', height: 45, borderRadius: 50}}
-                />
-              ) : (
-                <Image
-                  source={require('../../../assets/images/cat.jpeg')}
-                  style={{width: '100%', height: 45, borderRadius: 50}}
-                />
-              )}
+              <ImageGod
+                propWidth={45}
+                propHeight={45}
+                imageUrl={
+                  image_profile
+                    ? 'https://mammuts.it/' + image_profile
+                    : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                }
+                borderRadius={50}
+              />
             </View>
-            <View style={{flex: 6, paddingTop: 3}}>
+            <View style={{flex: 6, paddingTop: 3, paddingLeft: 4}}>
               <Text style={styles.normalText}>{nome + ' ' + cognome}</Text>
               <Text style={styles.normalText}>{email}</Text>
             </View>
@@ -40,9 +71,7 @@ class Connect extends React.Component {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() =>
-            Alert.alert('Remove', 'Remove from ties', [{text: 'Okay'}])
-          }
+          onPress={() => this.removeLegami(item.cf_key)}
           style={styles.addBoxRed}>
           <Text style={styles.addTextRed}>Rimuovere</Text>
         </TouchableOpacity>
@@ -52,25 +81,53 @@ class Connect extends React.Component {
 
   render() {
     const {legami} = this.props
-    // console.log(legami)
-    return (
-      <View style={{padding: 8}}>
-        {legami.map((single) => {
-          return (
-            <View key={single.id}>
-              {this.renderIndividualPeople(single)}
-              {/* single.nome + ' ' + single.cognome,
-                  single.email,
-                  single.image_profile, */}
-            </View>
-          )
-        })}
-        {/* {this.renderIndividualPeople('Davide Cavallari jdf iisdn')} */}
+    if (legami && legami.length > 0) {
+      return (
+        <View style={{padding: 8}}>
+          {legami.map((single) => {
+            return (
+              <View key={single.id}>{this.renderIndividualPeople(single)}</View>
+            )
+          })}
 
-        <View style={{marginBottom: 20}} />
-      </View>
-    )
+          <View style={{marginBottom: 20}} />
+        </View>
+      )
+    } else {
+      return (
+        <View style={{flex: 1, backgroundColor: '#000000'}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              padding: 20,
+              justifyContent: 'center',
+            }}>
+            <Icon name="frown" color="silver" style={{fontSize: 36}} />
+            <Text
+              style={{
+                color: 'silver',
+                fontSize: 21,
+                paddingLeft: 8,
+                paddingTop: 3,
+              }}>
+              Non hai legami
+            </Text>
+          </View>
+        </View>
+      )
+    }
   }
 }
 
-export default Connect
+function mapStateToProps(state) {
+  return {
+    legami: state.posts.legami,
+    otherLevel: state.auth.user
+  }
+}
+
+export default connect(mapStateToProps, {
+  legamiAddorRemove,
+  showLoading,
+  hideLoading,
+})(Connect)

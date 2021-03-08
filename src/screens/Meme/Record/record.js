@@ -28,7 +28,7 @@ import {
 import {getAudioFormData} from '../../../store/actions/audioActions'
 import {URLS} from '../../../config/urls'
 import styles from './styles'
-import RecordPlayer from './RecordPlayer'
+// import RecordPlayer from './RecordPlayer'
 
 const filename = 'mammuts.aac'
 

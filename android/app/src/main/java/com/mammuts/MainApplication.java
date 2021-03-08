@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.oblador.vectoricons.VectorIconsPackage;
 // import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
@@ -11,8 +12,6 @@ import org.devio.rn.splashscreen.SplashScreenReactPackage;
 // import com.cboy.rn.splashscreen.SplashScreenReactPackage;
 // import com.cboy.rn.splashscreen.SplashScreen;
 import com.reactnativecommunity.rctaudiotoolkit.AudioPackage;
-import com.oblador.vectoricons.VectorIconsPackage;
-import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -37,6 +36,7 @@ public class MainApplication extends Application implements ReactApplication {
 
           // return Arrays.<ReactPackage>asList(
           //           new MainReactPackage(),
+            // new VectorIconsPackage(),
             // new RNCWebViewPackage(),
             // new RNSoundPackage(),
             // new ReactSliderPackage(),

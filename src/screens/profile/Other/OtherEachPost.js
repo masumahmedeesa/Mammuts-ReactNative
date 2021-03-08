@@ -2,29 +2,19 @@ import React from 'react'
 import {
   Text,
   View,
-  Button,
-  StatusBar,
   TouchableOpacity,
-  TextInput,
   TouchableHighlight,
-  ScrollView,
-  Alert,
-  Switch,
-  Image,
   Dimensions,
 } from 'react-native'
-// import {WebView} from 'react-native-webview'
 import {connect} from 'react-redux'
-import Modal from 'react-native-modal'
+// import Modal from 'react-native-modal'
 import Icon from 'react-native-vector-icons/Feather'
-import SpecialIcon from 'react-native-vector-icons/MaterialIcons'
-// import HTMLView from 'react-native-htmlview'
+import ImageGod from '../../../components/ImageGod'
 import styles from '../styles'
 import SoundPlayer from '../SoundPlayer'
-// import SinglePlayer from './SinglePlayer'
 import {showLoading, hideLoading} from '../../../store/actions/supportActions'
 
-class OtherEachPostClass extends React.Component {
+class OtherEachPost extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -32,14 +22,30 @@ class OtherEachPostClass extends React.Component {
     }
   }
 
-  renderComment = (name, message) => {
+  renderComment = () => {
+    const {data, navigation, otherLevel, user} = this.props
+    const parsedLevel = JSON.parse(otherLevel)
+    const {commentUsers, comments} = data
+    let obj = {}
+    if (comments.audio) {
+      obj['title'] = 'wav remote download'
+      let genjam = comments.audio ? comments.audio : 'nope'
+      obj['url'] = 'https://mammuts.it' + genjam
+    }
+    // console.log('here')
     return (
-      <View style={[styles.cardW, {marginTop: 7}]}>
+      <View style={[styles.cardW, {marginTop: 7, marginBottom: 7}]}>
         <View style={{flex: 1, flexDirection: 'row'}}>
           <View style={{flex: 1, paddingRight: 5}}>
-            <Image
-              source={require('../../../../assets/images/cat.jpeg')}
-              style={{width: 35, height: 35, borderRadius: 50}}
+            <ImageGod
+              propWidth={35}
+              propHeight={35}
+              imageUrl={
+                commentUsers.image_profile
+                  ? 'https://mammuts.it/' + commentUsers.image_profile
+                  : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+              }
+              borderRadius={50}
             />
           </View>
           <View
@@ -56,14 +62,25 @@ class OtherEachPostClass extends React.Component {
                 justifyContent: 'space-between',
               }}>
               <View style={{flexDirection: 'row', padding: 1}}>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: 'rgb(0,184,249)',
-                    fontWeight: '500',
+                <TouchableOpacity
+                  onPress={() => {
+                    if (parsedLevel.id == commentUsers.id) {
+                      navigation.navigate('Profile')
+                    } else if (user.id == commentUsers.id) {
+                      //   navigation.navigate('Individual')
+                    } else {
+                      navigation.navigate('Individual', {user: commentUsers})
+                    }
                   }}>
-                  {name}
-                </Text>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: 'rgb(0,184,249)',
+                      fontWeight: '500',
+                    }}>
+                    {commentUsers.nome + ' ' + commentUsers.cognome}
+                  </Text>
+                </TouchableOpacity>
                 <Text
                   style={{
                     color: 'silver',
@@ -71,13 +88,24 @@ class OtherEachPostClass extends React.Component {
                     marginLeft: 5,
                     fontSize: 12,
                   }}>
-                  25/08/2020
+                  {comments.data_inserimento}
                 </Text>
               </View>
-              <Icon name="trash-2" color="silver" style={{fontSize: 15}} />
             </View>
             <View style={{padding: 3}}>
-              <Text style={{color: '#fff', fontSize: 12}}>{message}</Text>
+              {comments.testo ? (
+                <Text style={{color: '#fff', fontSize: 12}}>
+                  {comments.testo}
+                </Text>
+              ) : comments.audio ? (
+                <View style={{paddingTop: 2, paddingBottom: 2}}>
+                  {obj.url && <SoundPlayer soundInfo={obj} />}
+                </View>
+              ) : (
+                <Text style={{color: 'silver'}}>
+                  La connessione a Internet è interrotta!
+                </Text>
+              )}
             </View>
           </View>
         </View>
@@ -89,12 +117,11 @@ class OtherEachPostClass extends React.Component {
     this.setState({isOpen1: !this.state.isOpen1})
   }
 
-  renderPictures = (Pictures) => {
+  renderPictures = () => {
+    const {images} = this.props
+    let Pictures = images
     const screenHeight = Dimensions.get('screen').height
-    // const screenWidth = Dimensions.get('screen').width
     var stories = []
-    // console.log(Pictures, 'renderPictures')
-    // this.props.showLoading()
     for (let i = 0; i < Pictures.length; i++) {
       stories.push(
         <View
@@ -102,21 +129,22 @@ class OtherEachPostClass extends React.Component {
             flex: 1,
             paddingBottom: 2,
             paddingRight: 2,
+            backgroundColor: '#323232',
           }}>
-          <TouchableHighlight>
-            <Image
-              style={{width: '100%', height: screenHeight * 0.3}}
-              source={{uri: Pictures[0]}}
-              resizeMode="cover"
-              onLoadStart={()=>this.props.showLoading()}
-              onLoadEnd={()=>this.props.hideLoading()}
-            />
-          </TouchableHighlight>
+          <ImageGod
+            propWidth={'100%'}
+            propHeight={screenHeight * 0.4}
+            imageUrl={
+              Pictures[i]
+                ? Pictures[i]
+                : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+            }
+            borderRadius={0}
+          />
         </View>,
       )
     }
-    // this.props.hideLoading()
-    // console.log(stories.length)
+
     var firstTwo = []
     for (let k = 0; k < stories.length; k = k + 2) {
       if (k + 1 < stories.length) {
@@ -138,28 +166,107 @@ class OtherEachPostClass extends React.Component {
     else return <View />
   }
 
+  renderBondNames = () => {
+    const {data, navigation, otherLevel, user} = this.props
+    const parsedLevel = JSON.parse(otherLevel)
+    const {bondnames} = data
+    return (
+      <View>
+        {bondnames.map((single) => {
+          const dd = Date.now() + single.nome
+          return (
+            <View key={dd}>
+              <TouchableOpacity
+                style={{paddingLeft: 5}}
+                onPress={() => {
+                  if (parsedLevel.id == single.id) {
+                    navigation.navigate('Profile')
+                  } else if (user.id == single.id) {
+                    // navigation.navigate('Individual')
+                    // No job
+                  } else {
+                    navigation.navigate('Individual', {user: single})
+                  }
+                }}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: '500',
+                    color: 'rgb(0,184,249)',
+                  }}>
+                  {single ? single.nome + ' ' + single.cognome : 'Nobody'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )
+        })}
+      </View>
+    )
+  }
+
   render() {
-    let {
+    const {data, user, navigation, images, otherLevel} = this.props
+    const {
       name,
       description,
       published,
-      navigation,
-      image,
-      track,
-      info,
-      images,
       soundInfo,
       soundIsExist,
-    } = this.props
-    // soundInfo = "https://mammuts.it/vocal/" + soundInfo
-    // console.log(images)
-    // console.log(desc)
-    const {image_profile} = info
+      ownerId,
+      tags,
+      bondnames,
+      ownerInfo,
+      commentLength,
+      //   commentUsers,
+      //   comments,
+    } = data
+
+    const parsedUser = user
+    const parsedLevel = JSON.parse(otherLevel)
+
     return (
-      <View>
-        <View style={{paddingTop: 8}}>
-          <View
-            style={{backgroundColor: '#404040', borderRadius: 10, padding: 7}}>
+      <View style={{paddingTop: 9}}>
+        <TouchableHighlight
+          onPress={() =>
+            navigation.navigate('Story', {
+              images: images,
+              data: data,
+              user: parsedUser,
+              sender: 'Other',
+              // navigation: navigation,
+            })
+          }>
+          <View style={{backgroundColor: '#404040', padding: 8}}>
+            {tags.length > 0 && (
+              <View style={{flexDirection: 'row'}}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: 'silver',
+                    paddingBottom: 7,
+                  }}>
+                  Presenti nel ricordo
+                </Text>
+
+                {bondnames === 'Logged user' ? (
+                  <TouchableOpacity
+                    style={{paddingLeft: 5}}
+                    // onPress={() => navigation.navigate('Profile')}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: '400',
+                        color: 'rgb(0,184,249)',
+                      }}>
+                      {parsedUser.nome + ' ' + parsedUser.cognome}
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  this.renderBondNames()
+                )}
+              </View>
+            )}
 
             <View
               style={{
@@ -168,31 +275,66 @@ class OtherEachPostClass extends React.Component {
                 justifyContent: 'space-between',
               }}>
               <View style={{flexDirection: 'row'}}>
-              {image_profile ?
-                <Image
-                  source={{uri: "https://mammuts.it/"+image_profile}}
-                  style={{width: 35, height: 35, borderRadius: 50}}
-                /> : <Image
-                  source={require('../../../../assets/images/cat.jpeg')}
-                  style={{width: 35, height: 35, borderRadius: 50}}
-                />}
-
+                {parsedUser.id == ownerId ? (
+                  <ImageGod
+                    propWidth={35}
+                    propHeight={35}
+                    imageUrl={
+                      parsedUser.image_profile
+                        ? 'https://mammuts.it/' + parsedUser.image_profile
+                        : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                    }
+                    borderRadius={50}
+                  />
+                ) : (
+                  <ImageGod
+                    propWidth={35}
+                    propHeight={35}
+                    imageUrl={
+                      ownerInfo.image_profile
+                        ? 'https://mammuts.it/' + ownerInfo.image_profile
+                        : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                    }
+                    borderRadius={50}
+                  />
+                )}
                 <View>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: 'rgb(0,184,249)',
-                      fontWeight: '500',
-                      paddingLeft: 6,
-                      // paddingTop: 6,
-                    }}>
-                    Ricordo di Davide
-                  </Text>
+                  {parsedUser.id == ownerId ? (
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'rgb(0,184,249)',
+                        fontWeight: '400',
+                        paddingLeft: 6,
+                        // paddingTop: 6,
+                      }}>
+                      Ricordo personale
+                    </Text>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (parsedLevel.id == ownerId) {
+                          navigation.navigate('Profile')
+                        } else {
+                          navigation.navigate('Individual', {user: ownerInfo})
+                        }
+                      }}>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          color: 'rgb(0,184,249)',
+                          fontWeight: '400',
+                          paddingLeft: 6,
+                          // paddingTop: 6,
+                        }}>
+                        {ownerInfo.nome && 'Ricordo di ' + ownerInfo.nome}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
 
                   <Text
                     style={{
-                      fontSize: 11,
-                      fontWeight: '600',
+                      fontSize: 12,
                       color: 'silver',
                       paddingLeft: 6,
                     }}>
@@ -200,76 +342,18 @@ class OtherEachPostClass extends React.Component {
                   </Text>
                 </View>
               </View>
-
-              <View style={{flexDirection: 'row'}}>
-                <TouchableHighlight
-                  style={{paddingTop: 5}}
-                  onPress={() => {
-                    this.modalToggle()
-                  }}>
-                  <SpecialIcon
-                    name="report"
-                    color="hotpink"
-                    style={{fontSize: 20}}
-                  />
-                </TouchableHighlight>
-              </View>
-
-              <Modal
-                isVisible={this.state.isOpen1}
-                onBackdropPress={this.modalToggle}
-                // deviceHeight={screenHeight * 0.5}
-                // deviceWidth={screenWidth * 0.98}
-                backdropOpacity={0.3}
-                animationIn="zoomInDown"
-                animationOut="zoomOutUp"
-                animationInTiming={600}
-                animationOutTiming={600}
-                backdropTransitionInTiming={600}
-                backdropTransitionOutTiming={600}>
-                <View
-                  style={{
-                    backgroundColor: 'white',
-                    padding: 10,
-                    justifyContent: 'center',
-                    // alignItems: 'center',
-                    borderRadius: 4,
-                    borderColor: 'rgba(0, 0, 0, 0.1)',
-                  }}>
-                  <View>
-                    <Text>Segnala il post</Text>
-                    <Text>Motiva la tua segnalazione</Text>
-                    <TextInput
-                      placeholder={
-                        'scrivi qui le motivazioni della segnalazione di questo post'
-                      }
-                      placeholderTextColor="gray"
-                      returnKeyType="go"
-                      style={styles.textInputTT}
-                      onSubmitEditing={() => {}}
-                    />
-                    <View style={{flexDirection: 'row'}}>
-                      <Button title="Annulla" onPress={this.modalToggle} />
-                      <Button
-                        title="Invia la segnalazione"
-                        onPress={this.modalToggle}
-                      />
-                    </View>
-                  </View>
-                </View>
-              </Modal>
             </View>
 
-            <View style={{flexDirection: 'row', paddingTop: 7}}>
+            <View style={{flexDirection: 'row', paddingTop: 9}}>
               <Icon
                 name="map-pin"
                 color="rgb(0,184,249)"
-                style={{fontSize: 15}}
+                style={{fontSize: 18}}
               />
               <Text
                 style={{
                   fontSize: 14,
-                  fontWeight: '600',
+                  fontWeight: '400',
                   color: 'silver',
                   marginLeft: 5,
                 }}>
@@ -277,121 +361,102 @@ class OtherEachPostClass extends React.Component {
               </Text>
             </View>
 
+            <View
+              style={{
+                paddingLeft: 2,
+                paddingTop: 8,
+                paddingBottom: 8,
+                flex: 1,
+              }}>
+              <Text style={{fontSize: 14, color: 'white'}}>{description}</Text>
+            </View>
+
             {soundIsExist.length > 0 && (
               <View style={{paddingTop: 6, paddingBottom: 6}}>
                 <SoundPlayer soundInfo={soundInfo} />
               </View>
             )}
-            {/* <SinglePlayer track={track}/> */}
-            <View style={{paddingLeft: 2, paddingTop: 3, flex: 1}}>
-              <Text style={{fontSize: 14, fontWeight: '600', color: 'silver'}}>
-                {description}
-              </Text>
-            </View>
 
-            <View style={{paddingTop: 6}}>
-              {this.renderPictures(images)}
-              {/* <Image
-                style={{
-                  width: screenWidth * 0.96,
-                  height: screenHeight * 0.3,
-                  borderRadius: 10,
-                }}
-                source={require('../../../assets/images/cat4.jpg')}
-                resizeMode="cover"
-              /> */}
-            </View>
-
-            {/* <View style={[styles.cardTwo, {marginTop: 10, marginLeft: 2}]}>
-              <Text style={{fontSize: 14, fontWeight: '500', color: 'cyan'}}>
-                Privacy Del Post
-              </Text>
-  
-              <View style={{flex: 1, flexDirection: 'row', paddingTop: 3}}>
-                <Text style={{fontSize: 13, flex: 6}}>
-                  Abilita questa opzione per rendere il post visible solo a te
-                </Text>
-                <View style={{flex: 1, paddingTop: 5, paddingRight: 5}}>
-                  <Switch
-                    trackColor={{false: '#000000', true: '#fff'}}
-                    // thumbColor={isEnable ? 'rgb(0,184,249)' : '#f4f3f3'}
-                    // onValueChange={switchHandler}
-                    // value={isEnable}
-                    ios_backgroundColor="#000000"
-                  />
-                </View>
-              </View>
-            </View> */}
+            <View style={{paddingTop: 6}}>{this.renderPictures()}</View>
 
             <View style={{paddingTop: 5}} />
-            {/* {this.renderComment(
-              'Davide Cavallari',
-              'Registro audio pubblico foto indico il luogo dove ho scattato foto Posso rendere il post visibile solo a me',
-            )} */}
-
-            <View
-              style={{
-                marginTop: 6,
-                marginLeft: 2,
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                backgroundColor: '#323232',
-                borderRadius: 8,
-              }}>
-              <TextInput
-                placeholder={'Lascia un commento'}
-                placeholderTextColor="gray"
-                returnKeyType="go"
-                style={styles.textInputW}
-                onSubmitEditing={() => {}}
-              />
-              <View style={{flexDirection: 'row'}}>
-                <TouchableHighlight
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 8,
-                  }}
-                  onPress={() => {
-                    Alert.alert('Comment', 'Can upload comment in beckend :)', [
-                      {text: 'Okay'},
-                    ])
-                  }}>
-                  <Icon
-                    name="send"
-                    style={{fontSize: 20, fontWeight: '500', color: 'silver'}}
-                  />
-                </TouchableHighlight>
-                <TouchableHighlight
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    paddingRight: 5,
-                    paddingLeft: 5,
-                    borderRadius: 8,
-                  }}
-                  onPress={() => {
-                    Alert.alert('Audio', 'Can upload audio in beckend :)', [
-                      {text: 'Okay'},
-                    ])
-                  }}>
-                  <Icon
-                    name="mic"
-                    style={{fontSize: 20, fontWeight: '500', color: 'silver'}}
-                  />
-                </TouchableHighlight>
+            {commentLength > 0 && this.renderComment()}
+            {commentLength > 1 && (
+              <View style={{marginBottom: 7}}>
+                <Text style={{color: 'rgb(0,184,249)'}}>
+                  Leggi altre {commentLength - 1} comunicazioni...
+                </Text>
               </View>
-            </View>
+            )}
+
+            <TouchableHighlight
+              onPress={() => {
+                navigation.navigate('Story', {
+                  images: images,
+                  data: data,
+                  user: parsedUser,
+                  sender: 'Other',
+                })
+              }}>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  backgroundColor: '#323232',
+                  borderRadius: 8,
+                  padding: 5,
+                }}>
+                <View>
+                  <Text style={{color: 'grey', padding: 1}}>
+                    Lascia un commento..
+                  </Text>
+                </View>
+                <View style={{flexDirection: 'row'}}>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 8,
+                    }}>
+                    <Icon
+                      name="send"
+                      style={{fontSize: 20, fontWeight: '500', color: 'silver'}}
+                    />
+                  </View>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingRight: 5,
+                      paddingLeft: 5,
+                      borderRadius: 8,
+                    }}>
+                    <Icon
+                      name="mic"
+                      style={{fontSize: 20, fontWeight: '500', color: 'silver'}}
+                    />
+                  </View>
+                </View>
+              </View>
+            </TouchableHighlight>
           </View>
-        </View>
+        </TouchableHighlight>
       </View>
     )
   }
 }
 
-const OtherEachPost = (props) => {
-  return <OtherEachPostClass {...props} />
+function mapStateToProps(state) {
+  return {
+    otherLevel: state.auth.user,
+  }
 }
 
-export default connect(null, {showLoading, hideLoading})(OtherEachPost)
+const OtherEachPostFunction = (props) => {
+  return <OtherEachPost {...props} />
+}
+
+export default connect(mapStateToProps, {showLoading, hideLoading})(
+  OtherEachPostFunction,
+)

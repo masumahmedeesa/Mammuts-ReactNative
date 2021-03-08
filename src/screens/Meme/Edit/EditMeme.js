@@ -18,6 +18,7 @@ import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/Feather'
 import {useNavigation} from '@react-navigation/native'
 import Autocomplete from 'native-base-autocomplete'
+import ImageGod from '../../../components/ImageGod'
 import SoundPlayer from '../../profile/SoundPlayer'
 import Toast from 'react-native-simple-toast'
 import styles from '../styles'
@@ -200,12 +201,18 @@ class EditMemeScreen extends React.Component {
       'https://mammuts.it/upload/ricordo/' + item.split('/')[3]
     return (
       <View key={item.file} style={{width: '33%', margin: 2}}>
-        <Image
+        <ImageGod
+          propWidth={'100%'}
+          propHeight={100}
+          imageUrl={suitableName}
+          borderRadius={10}
+        />
+        {/* <Image
           source={{uri: suitableName}}
           style={styles.photoThumb}
           // onLoadStart={() => this.props.showLoading()}
           // onLoadEnd={() => this.props.hideLoading()}
-        />
+        /> */}
         <TouchableOpacity
           style={styles.photo}
           onPress={() => this.onRemoveGalleryImage(index, item)}>
@@ -310,7 +317,17 @@ class EditMemeScreen extends React.Component {
               <View style={{paddingLeft: 10}}>
                 <View style={{flexDirection: 'row'}}>
                   <View style={{flex: 1, paddingRight: 5}}>
-                    {image_profile ? (
+                    <ImageGod
+                      propWidth={'100%'}
+                      propHeight={45}
+                      imageUrl={
+                        image_profile
+                          ? 'https://mammuts.it/' + image_profile
+                          : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                      }
+                      borderRadius={50}
+                    />
+                    {/* {image_profile ? (
                       <Image
                         source={{uri: 'https://mammuts.it/' + image_profile}}
                         style={{width: '100%', height: 45, borderRadius: 50}}
@@ -320,7 +337,7 @@ class EditMemeScreen extends React.Component {
                         source={require('../../../../assets/images/cat.jpeg')}
                         style={{width: '100%', height: 45, borderRadius: 50}}
                       />
-                    )}
+                    )} */}
                   </View>
                   <View style={{flex: 6, paddingTop: 2}}>
                     <Text
@@ -393,7 +410,8 @@ class EditMemeScreen extends React.Component {
     } = this.state
 
     const {commentLength, commentUsers, comments} = this.props.route.params.data
-    
+    const {sender} = this.props.route.params
+
     this.props.showLoading()
     let cc, audioFileName
     if (audio.formdata) {
@@ -457,13 +475,14 @@ class EditMemeScreen extends React.Component {
         selectedUser: [],
         query: '',
       })
-      this.props.postUpdate(res, commentLength, commentUsers, comments)
+      const user = JSON.parse(this.props.auth.user)
+      this.props.postUpdate(res, commentLength, commentUsers, comments, user)
       // setTimeout(() => {
-      Toast.show('Data has been updated successfully!')
+      Toast.show('La memoria è stata aggiornata con successo!')
       // }, 800)
-      navigation.navigate('Profile')
+      navigation.navigate(sender ? sender : 'Profile')
     } else {
-      Toast.show('No internet connection!')
+      Toast.show('Errore di connessione a Internet :(')
     }
   }
 

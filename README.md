@@ -1,6 +1,16 @@
+### TO RUN ON ANDROID
+JUST RUN 
+- chsh -s /bin/bash
+- adb devices
+- react-native run-android
+
+
+react-native start --reset-cache
+
 ## UPDATE
 Create OtherStoryScreen for showing other people's stories under of course ProfileStack Screen. 'Remove or add ties' would be good. AND SearchStackScreen also
 
+### https://mammuts.it/upload/profile/logo_mammuts.png
 
 ## IMAGE UPLOADING FIXED 
 https://stackoverflow.com/questions/54663887/missing-request-token-for-request
@@ -45,8 +55,11 @@ https://stackoverflow.com/questions/54663887/missing-request-token-for-request
 npm install @react-navigation/material-bottom-tabs react-native-paper
 npm install --save react-native-animatable
 
-### COMMANDS
-react-native unlink react-native-gesture-handler --platforms ios
+### UNINSTALL COMMANDS
+react-native unlink <lib name>
+react-native uninstall <lib name>
+- npm uninstall react-native-gesture-handler
+- react-native unlink react-native-gesture-handler --platforms ios
 
 ### ERRORS
 1. 
@@ -56,6 +69,18 @@ Multiple commands produce '/Users/masumahmed/Library/Developer/Xcode/DerivedData
 2) That command depends on command in Target 'Mammuts' (project 'Mammuts'): script phase “[CP] Copy Pods Resources”
 Solution_ 'Mammuts' target > Build Phases > Copy Bundle Resources > [Delete whatever causes Problem]
 
+2. If problem with /node_modules/react-native-date-picker/ios/RNDatePicker/DatePicker.m:58:18: Property 'preferredDatePickerStyle' not found on object of type 'DatePicker *'
+or, (on Command)
+The following build commands failed:
+	CompileC /Users/masumahmed/Library/Developer/Xcode/DerivedData/Mammuts-ehwzyfdmowujthahcsphmsijhyaw/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/react-native-date-picker.build/Objects-normal/x86_64/DatePicker.o /Volumes/Tasks/Freelances/Mammuts/node_modules/react-native-date-picker/ios/RNDatePicker/DatePicker.m normal x86_64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+(1 failure)
+
+Just run the project on XCode and commnet the line which causes error.
+Go Pods > Development Pods > react-native-date-picker > RNDatePickerManager.m
+
+//        if(@available(iOS 14, *)) {
+//            self.preferredDatePickerStyle = UIDatePickerStyleWheels;
+//        }
 
 
 ## To add fonts
@@ -109,33 +134,6 @@ npx react-native link
             </View>
           </View>
         </Modal> */}
-
-  /**
-  {
-    "id": "2222",
-    "url": "https://drive.google.com/uc?export=download&id=1VM9_umeyzJn0v1pRzR1BSm9y3IhZ3c0E",
-    "title": "Soul Searching (Demo)",
-    "artist": "David Chavez",
-    "artwork": "https://i.picsum.photos/id/200/200/200.jpg",
-    "duration": 77
-  },
-  {
-    "id": "3333",
-    "url": "https://drive.google.com/uc?export=download&id=1bmvPOy2IVbkUROgm0dqiZry_miiL4OqI",
-    "title": "Lullaby (Demo)",
-    "artist": "David Chavez",
-    "artwork": "https://i.picsum.photos/id/300/200/200.jpg",
-    "duration": 71
-  },
-  {
-    "id": "4444",
-    "url": "https://drive.google.com/uc?export=download&id=1V-c_WmanMA9i5BwfkmTs-605BQDsfyzC",
-    "title": "Rhythm City (Demo)",
-    "artist": "David Chavez",
-    "artwork": "https://i.picsum.photos/id/400/200/200.jpg",
-    "duration": 106
-  }
-  */
 
 
 ### WROKABLE RECORD.js
@@ -603,43 +601,3 @@ export default RecordFunction
 
 // Rocording information
 // {"_duration": -1, "_fsPath": "/Users/masumahmed/Library/Developer/CoreSimulator/Devices/B24DB460-6B91-4975-86F4-BA54E18761BF/data/Containers/Data/Application/0EB08A1C-A88C-470A-8A03-D744D680E9C0/Documents/mm.aac", "_lastSync": -1, "_options": {"bitrate": 256000, "channels": 2, "quality": "max", "sampleRate": 44100}, "_path": "mm.aac", "_position": -1, "_recorderId": 20, "_state": -2}
-{
-  /* <View>
-          <Text style={styles.title}>Recording</Text>
-        </View>
-        <View>
-          <Button
-            title={this.state.recordButton}
-            disabled={this.state.recordButtonDisabled}
-            onPress={() => this._toggleRecord()}
-          />
-        </View>
-        <View>
-          <Text style={styles.errorMessage}>{this.state.error}</Text>
-        </View> */
-}
-
-{
-  /* <View>
-              <Button
-                title={this.state.playPauseButton}
-                disabled={this.state.playButtonDisabled}
-                onPress={() => this._playPause()}
-              />
-              <Button
-                title={'Stop'}
-                disabled={this.state.stopButtonDisabled}
-                onPress={() => this._stop()}
-              />
-            </View> */
-}
-
-{
-  /* <View style={styles.settingsContainer}>
-          <Switch
-            onValueChange={(value) => this._toggleLooping(value)}
-            value={this.state.loopButtonStatus}
-          />
-          <Text>Toggle Looping</Text>
-        </View> */
-}

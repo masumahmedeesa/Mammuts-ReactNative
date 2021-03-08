@@ -5,25 +5,22 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  TouchableHighlight,
   Switch,
   Alert,
   FlatList,
-  Image,
-  Button,
-  Platform,
   SafeAreaView,
   LogBox,
-  ActivityIndicator,
-  Modal,
+  Platform
 } from 'react-native'
 import Axios from 'axios'
 import ImagePicker from 'react-native-image-crop-picker'
 import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/Feather'
 import {useNavigation} from '@react-navigation/native'
-import Autocomplete from 'native-base-autocomplete'
+import Autocomplete from 'react-native-autocomplete-input'
+// import Autocomplete from 'native-base-autocomplete'
 import Toast from 'react-native-simple-toast'
+import ImageGod from '../../components/ImageGod'
 import styles from './styles'
 import {URLS} from '../../config/urls'
 import {showLoading, hideLoading} from '../../store/actions/supportActions'
@@ -54,13 +51,8 @@ class MemeScreen extends React.Component {
 
   componentDidMount() {
     LogBox.ignoreLogs(['VirtualizedLists should never be nested'])
-    const user = JSON.parse(this.props.auth.user)
     const {audio} = this.props
     this.props.showLoading()
-    if (user) {
-      // this.props.ricodioActions(user.id, 1)
-      this.props.legamiCollection(user.cf_key)
-    }
     if (audio.formdata) {
       this.props.removeAudio()
     }
@@ -86,9 +78,12 @@ class MemeScreen extends React.Component {
 
   uploadData = async (data, url) => {
     const response = await Axios({
-      method: 'post',
+      method: 'POST',
       url: url,
       data: data,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+    }
     })
     return response.data
   }
@@ -110,14 +105,15 @@ class MemeScreen extends React.Component {
       try {
         this.props.showLoading()
         const fileName = image.path.split('/')
+        // everything is fine
         const data = new FormData()
         data.append('file', {
           uri: image.path,
-          type: image.mime,
           name: fileName[fileName.length - 1],
+          type: image.mime,
           // type: 'multipart/form-data',
         })
-
+        // console.log(image.path,fileName[fileName.length - 1],image.mime)
         let cc = ''
         try {
           cc = (await this.uploadData(data, URLS.UPLOAD_FILE)).immagine
@@ -127,7 +123,6 @@ class MemeScreen extends React.Component {
           console.log(e)
         }
         const result = data
-        // console.log(result)
         if (result) {
           this.setState({
             imageList: [...this.state.imageList, result],
@@ -190,10 +185,16 @@ class MemeScreen extends React.Component {
     // console.log(('renderGalleryItemSecond', JSON.stringify(item._parts[0][1].uri)))
     return (
       <View key={item.file} style={{width: '33%', margin: 2}}>
-        <Image
+        <ImageGod
+          propWidth={'100%'}
+          propHeight={100}
+          imageUrl={item._parts[0][1].uri}
+          borderRadius={10}
+        />
+        {/* <Image
           source={{uri: item._parts[0][1].uri}}
           style={styles.photoThumb}
-        />
+        /> */}
         <TouchableOpacity
           style={styles.photo}
           onPress={() => this.onRemoveGalleryImage(index)}>
@@ -233,15 +234,15 @@ class MemeScreen extends React.Component {
     this.setState({racconta: value})
   }
 
-  uploadData = async (data, url) => {
-    // console.log(data,'upload')
-    const response = await Axios({
-      method: 'post',
-      url: url,
-      data: data,
-    })
-    return response.data
-  }
+  // uploadData = async (data, url) => {
+  //   // console.log(data,'upload')
+  //   const response = await Axios({
+  //     method: 'post',
+  //     url: url,
+  //     data: data,
+  //   })
+  //   return response.data
+  // }
 
   findUser = (query) => {
     if (query === '') {
@@ -260,6 +261,7 @@ class MemeScreen extends React.Component {
   }
 
   onPressedAuto = (item) => {
+    console.log('clicked')
     this.setState({query: item.nome + ' ' + item.cognome})
   }
 
@@ -278,6 +280,7 @@ class MemeScreen extends React.Component {
 
   renderUsers = () => {
     const {selectedUser} = this.state
+    // console.log(selectedUser)
     return (
       <View>
         {selectedUser.map((single) => {
@@ -287,17 +290,16 @@ class MemeScreen extends React.Component {
               <View style={{paddingLeft: 10}}>
                 <View style={{flexDirection: 'row'}}>
                   <View style={{flex: 1, paddingRight: 5}}>
-                    {image_profile ? (
-                      <Image
-                        source={{uri: 'https://mammuts.it/' + image_profile}}
-                        style={{width: '100%', height: 45, borderRadius: 50}}
-                      />
-                    ) : (
-                      <Image
-                        source={require('../../../assets/images/cat.jpeg')}
-                        style={{width: '100%', height: 45, borderRadius: 50}}
-                      />
-                    )}
+                    <ImageGod
+                      propWidth={45}
+                      propHeight={45}
+                      imageUrl={
+                        image_profile
+                          ? 'https://mammuts.it/' + image_profile
+                          : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                      }
+                      borderRadius={50}
+                    />
                   </View>
                   <View style={{flex: 6, paddingTop: 2}}>
                     <Text
@@ -327,7 +329,8 @@ class MemeScreen extends React.Component {
     )
   }
 
-  renderSearchedItem = (item) => {
+  renderSearchedItem = ({item}) => {
+    // console.log(item)
     if (item) {
       const dd = Date.now() + item.cf_key
       return (
@@ -348,7 +351,7 @@ class MemeScreen extends React.Component {
 
   uploadAllKindsOfData = async (data) => {
     const response = await Axios({
-      method: 'post',
+      method: 'POST',
       url: URLS.RICORDI,
       data: data,
     })
@@ -395,8 +398,10 @@ class MemeScreen extends React.Component {
     }
     this.props.hideLoading()
 
-    this.props.postCreate(res)
+    const user = JSON.parse(this.props.auth.user)
+    this.props.postCreate(res, user)
 
+    // console.log('ashse')
     if (res) {
       this.setState({
         isEnable: false,
@@ -417,9 +422,10 @@ class MemeScreen extends React.Component {
       //   // console.log('hello')
       // }, 400)
       // this.toast.show('La tua memoria è stata caricata con successo!', 800)
+      // console.log('ashse2')
       navigation.navigate('Profile')
     } else {
-      Toast.show('Data is not uploaded!', Toast.LONG)
+      Toast.show('Errore di connessione a Internet :(', Toast.LONG)
     }
   }
 
@@ -438,7 +444,7 @@ class MemeScreen extends React.Component {
               <Text style={styles.textNew}>Tagga un tuo legame</Text>
             </View>
           </View>
-          <View style={{marginTop: 47}} />
+          <View style={{marginTop: Platform.OS === "ios" ? 47 : 25}} />
           <View style={styles.containerAuto}>
             <Autocomplete
               autoCapitalize="none"
@@ -457,15 +463,16 @@ class MemeScreen extends React.Component {
               // renderItem={single => <ListItem>
               //   <Text>{single.nome}</Text>
               // </ListItem>}
-              renderItem={(single) => this.renderSearchedItem(single)}
+              renderItem={this.renderSearchedItem}
+              // renderItem={(single) => this.renderSearchedItem(single)}
             />
           </View>
 
-          {selectedUser.length > 0 && <View style={{marginTop: 15}} />}
+          {selectedUser.length > 0 && <View style={{marginTop: Platform.OS === "ios" ? 15 : 0}} />}
 
           {selectedUser.length > 0 ? this.renderUsers() : <View />}
 
-          <View style={{marginTop: 15}}>
+          <View style={{marginTop: 0}}>
             <View style={styles.newStyle}>
               <Text style={styles.textNew}>
                 Dove hai vissuto questo ricordo?
@@ -572,7 +579,7 @@ class MemeScreen extends React.Component {
               </View>
             </View>
           </View>
-          {/* <Toast ref={(toast) => (this.toast = toast)} /> */}
+          
           {dove.length > 0 && racconta.length > 0 ? (
             <TouchableOpacity onPress={this.submitHandler}>
               <View style={styles.publiccaView}>
@@ -611,6 +618,26 @@ export default connect(mapStateToProps, {
   removeAudio,
 })(MemeScreenFunction)
 
+/// ios AutoComplete
+{/* <Autocomplete
+autoCapitalize="none"
+autoCorrect={false}
+// inputContainerStyle={styles.autocompleteContainer}
+// containerStyle={styles.autocompleteContainer}
+data={
+  filteredUsers.length === 1 && comp(query, filteredUsers[0].nome)
+    ? []
+    : filteredUsers
+}
+defaultValue={query}
+onChangeText={this.autoCompleteTextController}
+placeholder="Tagga un tuo legame"
+// renderItem={({item}) => this.renderSearchedItem({item})}
+// renderItem={single => <ListItem>
+//   <Text>{single.nome}</Text>
+// </ListItem>}
+renderItem={(single) => this.renderSearchedItem(single)}
+/> */}
 /* <TextInput
                 name="tagga"
                 placeholder={'Tagga un tuo legame'}

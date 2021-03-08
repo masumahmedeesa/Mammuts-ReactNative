@@ -39,3 +39,9 @@ export const removeComment = (data) => (dispatch) => {
     })
     .catch((error) => console.log(error, 'removeComment'))
 }
+
+export const refreshComment = () => (dispatch) => {
+  dispatch({
+    type: Types.REFRESH_COMMENT,
+  })
+}

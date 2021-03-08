@@ -23,3 +23,9 @@ export const getAllUsers = () => (dispatch) => {
     //   })
     })
 }
+
+export const refreshUsers = () => (dispatch) => {
+  dispatch({
+    type: Types.REFRESH_USERS
+  })
+}

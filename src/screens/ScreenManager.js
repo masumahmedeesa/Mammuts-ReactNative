@@ -3,32 +3,26 @@ import {Image, View, Text, Alert, Platform} from 'react-native'
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs'
 import {createStackNavigator} from '@react-navigation/stack'
 import Icon from 'react-native-vector-icons/Feather'
-// import {connect} from 'react-redux'
-// import {logoutAction} from '../store/actions/authActions'
 
 import HomeScreen from './Home/HomeScreen'
 import ProfileScreen from './profile/ProfileScreen'
 import SearchScreen from './search/SearchScreen'
-// import FavouriteScreen from './favouriteScreen';
 import * as Animatable from 'react-native-animatable'
 import StoryScreen from '../screens/Story/story'
 
 import MemeScreen from '../screens/Meme/index'
 import EditMemeScreen from '../screens/Meme/Edit/EditMeme'
-// import PlaylistScreen from '../screens/recording/playlist'
-// import SoundPlayer from './profile/SoundPlayer'
-// import Record from './Meme/Record/record'
-// import AudioAnimation from './Meme/Record/audioAnimations'
+
 import IndividualScreen from './profile/Individual/Individual'
 import OtherScreen from './profile/Other/Other'
-// import Test from '../screens/Meme/test'
+import Ricordo from './ricordo/ricordo'
 
 const Tab = createMaterialBottomTabNavigator()
 const HomeStack = createStackNavigator()
 const ProfileStack = createStackNavigator()
 const SearchStack = createStackNavigator()
 const MemeStack = createStackNavigator()
-// const FavouriteStack = createStackNavigator();
+const RicordoStack = createStackNavigator()
 
 const ScreenManager = () => (
   <Tab.Navigator
@@ -40,46 +34,49 @@ const ScreenManager = () => (
       name="Home"
       component={HomeStackScreen}
       options={{
-        tabBarLabel: 'Home',
+        tabBarLabel: 'Casa',
         tabBarColor: '#202020',
         tabBarIcon: ({color}) => <Icon name="home" color={color} size={26} />,
       }}
     />
+
     <Tab.Screen
       name="meme"
       component={MemeStackScreen}
       options={{
-        tabBarLabel: 'Add',
+        tabBarLabel: 'Inserisci',
         tabBarColor: '#202020',
         tabBarIcon: ({color}) => (
           <Icon name="plus-square" color={color} size={25} />
         ),
       }}
     />
+
     <Tab.Screen
       name="Search"
       component={SearchStackScreen}
       options={{
-        tabBarLabel: 'Search',
+        tabBarLabel: 'Ricerca',
         tabBarColor: '#202020',
         tabBarIcon: ({color}) => <Icon name="search" color={color} size={26} />,
       }}
     />
 
-    {/* <Tab.Screen
-      name="favourites"
-      component={SearchScreen}
+    <Tab.Screen
+      name="Ricordo"
+      component={RicordoStackScreen}
       options={{
-        tabBarLabel: 'Favourites',
+        tabBarLabel: 'Ricordo',
         tabBarColor: '#202020',
-        tabBarIcon: ({color}) => <Icon name="heart" color={color} size={25} />,
+        tabBarIcon: ({color}) => <Icon name="grid" color={color} size={25} />,
       }}
-    /> */}
+    />
+
     <Tab.Screen
       name="Profile"
       component={ProfileStackScreen}
       options={{
-        tabBarLabel: 'Profile',
+        tabBarLabel: 'Profilo',
         tabBarColor: '#202020',
         tabBarIcon: ({color}) => <Icon name="user" color={color} size={26} />,
       }}
@@ -158,7 +155,7 @@ const ProfileStackScreen = ({navigation}) => (
       name="Profile"
       component={ProfileScreen}
       options={{
-        // title: 'II Tuo Profilo',
+        title: 'Profilo',
         // headerTintColor: 'rgb(0,184,249)',
         headerTitle: () => (
           <Text
@@ -170,7 +167,7 @@ const ProfileStackScreen = ({navigation}) => (
               padding: 3,
               fontWeight: '500',
             }}>
-            II Tuo Profilo
+            Il mio profilo
           </Text>
         ),
         headerLeft: () => (
@@ -194,28 +191,10 @@ const ProfileStackScreen = ({navigation}) => (
       }}
     />
     <ProfileStack.Screen
-      name="Individual"
-      component={IndividualScreen}
-      options={{
-        title: 'II Tuo Profilo',
-        headerTintColor: '#fff',
-        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
-      }}
-    />
-    <ProfileStack.Screen
-      name="Other"
-      component={OtherScreen}
-      options={{
-        title: 'II Tuo Profilo',
-        headerTintColor: '#fff',
-        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
-      }}
-    />
-    <ProfileStack.Screen
       name="Story"
       component={StoryScreen}
       options={{
-        title: 'II Tuo Profilo',
+        title: 'Storia',
         headerTintColor: '#fff',
         headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
       }}
@@ -224,7 +203,25 @@ const ProfileStackScreen = ({navigation}) => (
       name="EditMeme"
       component={EditMemeScreen}
       options={{
-        title: 'Edit Memory',
+        title: 'Modifica memoria',
+        headerTintColor: '#fff',
+        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
+      }}
+    />
+    <ProfileStack.Screen
+      name="Individual"
+      component={IndividualScreen}
+      options={{
+        title: 'Profilo di Tie',
+        headerTintColor: '#fff',
+        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
+      }}
+    />
+    <ProfileStack.Screen
+      name="Other"
+      component={OtherScreen}
+      options={{
+        title: 'Profilo di Tie',
         headerTintColor: '#fff',
         headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
       }}
@@ -268,14 +265,33 @@ const SearchStackScreen = ({navigation}) => (
         ),
       }}
     />
-    {/* <SearchStack.Screen
+    <SearchStack.Screen
       name="Story"
       component={StoryScreen}
       options={{
+        title: 'Storia',
         headerTintColor: '#fff',
         headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
       }}
-    /> */}
+    />
+    <SearchStack.Screen
+      name="Individual"
+      component={IndividualScreen}
+      options={{
+        title: 'Profilo di Tie',
+        headerTintColor: '#fff',
+        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
+      }}
+    />
+    <SearchStack.Screen
+      name="Other"
+      component={OtherScreen}
+      options={{
+        title: 'Profilo di Tie',
+        headerTintColor: '#fff',
+        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
+      }}
+    />
   </SearchStack.Navigator>
 )
 
@@ -315,37 +331,80 @@ const MemeStackScreen = ({navigation}) => (
         ),
       }}
     />
-    {/* <MemeStack.Screen
-          name="Test"
-          component={Test}
-          options={{
-            headerTintColor: '#fff',
-            headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
-          }}
-    /> */}
-    {/* <MemeStack.Screen
-      name="Record"
-      component={Record}
-      options={{
-        headerTintColor: '#fff',
-        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
-      }}
-    /> */}
-    {/* <MemeStack.Screen
-      name="Test"
-      component={AudioAnimation}
-      options={{
-        headerTintColor: '#fff',
-        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
-      }}
-    /> */}
-    {/* <MemeStack.Screen
-      name="Playlist"
-      component={SoundPlayer}
-      options={{
-        headerTintColor: '#fff',
-        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
-      }}
-    /> */}
   </MemeStack.Navigator>
+)
+
+const RicordoStackScreen = ({navigation}) => (
+  <RicordoStack.Navigator
+    screenOptions={{
+      headerStyle: {
+        backgroundColor: '#000000',
+        shadowColor: 'transparent',
+      },
+    }}>
+    <RicordoStack.Screen
+      name="Ricordo"
+      component={Ricordo}
+      options={{
+        headerTitle: () => (
+          <Text
+            style={{
+              textAlign: 'center',
+              marginRight: Platform.OS == 'ios' ? 0 : 45,
+              color: 'rgb(0,184,249)',
+              fontSize: 21,
+              padding: 3,
+              fontWeight: '500',
+            }}>
+            Ricordo
+          </Text>
+        ),
+        headerLeft: () => (
+          <Icon.Button
+            name="menu"
+            backgroundColor="#000000"
+            color="hotpink"
+            onPress={() => {
+              navigation.openDrawer()
+            }}></Icon.Button>
+        ),
+      }}
+    />
+    <SearchStack.Screen
+      name="Individual"
+      component={IndividualScreen}
+      options={{
+        title: 'Profilo di Tie',
+        headerTintColor: '#fff',
+        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
+      }}
+    />
+    <SearchStack.Screen
+      name="Other"
+      component={OtherScreen}
+      options={{
+        title: 'Profilo di Tie',
+        headerTintColor: '#fff',
+        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
+      }}
+    />
+    <RicordoStack.Screen
+      name="Story"
+      component={StoryScreen}
+      options={{
+        title: 'Storia',
+        headerTintColor: '#fff',
+        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
+      }}
+    />
+    <ProfileStack.Screen
+      name="EditMeme"
+      component={EditMemeScreen}
+      options={{
+        title: 'Modifica memoria',
+        headerTintColor: '#fff',
+        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
+      }}
+    />
+  </RicordoStack.Navigator>
 )

@@ -2,7 +2,7 @@ import Axios from 'axios'
 import * as Types from './types'
 import {URLS} from '../../config/urls'
 
-export const ricodioActions = (userId, page) => (dispatch) => {
+export const ricodioActions = (userId, page, parsedUser) => (dispatch) => {
   Axios.get(URLS.STORIES + `${userId}?page=${page}`)
     .then((response) => {
       // console.log(response.data,'actions')
@@ -10,6 +10,7 @@ export const ricodioActions = (userId, page) => (dispatch) => {
         type: Types.GET_POST,
         payload: {
           posts: response.data,
+          parsedUser: parsedUser
           // total: response.data.total,
         },
       })
@@ -27,8 +28,9 @@ export const ricodioActions = (userId, page) => (dispatch) => {
     })
 }
 
-export const legamiCollection = () => (dispatch) => {
-  Axios.get(URLS.LEGAMI_PERSONAL)
+export const legamiCollection = (id) => (dispatch) => {
+  // console.log(URLS.LEGAMI_PERSONAL+id)
+  Axios.get(URLS.LEGAMI_PERSONAL+id)
     .then((response) => {
       dispatch({
         type: Types.LEGAMI_PERSONAL,
@@ -65,11 +67,12 @@ export const legamiAddorRemove = (data) => (dispatch) => {
     .catch((error) => console.log(error, 'legamiAddorRemove'))
 }
 
-export const postCreate = (data) => (dispatch) => {
+export const postCreate = (data, parsedUserUpload) => (dispatch) => {
   dispatch({
     type: Types.UPLOAD_POST,
     payload: {
       createdData: data,
+      parsedUserUpload: parsedUserUpload
     },
   })
 }
@@ -87,7 +90,7 @@ export const postDelete = (id) => (dispatch) => {
     .catch((error) => console.log(error, 'postDelete actions'))
 }
 
-export const postUpdate = (data, commentLength, commentUsers, comments) => (
+export const postUpdate = (data, commentLength, commentUsers, comments, parsedUserUpdate) => (
   dispatch,
 ) => {
   data['commentLength'] = commentLength
@@ -97,6 +100,13 @@ export const postUpdate = (data, commentLength, commentUsers, comments) => (
     type: Types.EDIT_POST,
     payload: {
       editedPost: data,
+      parsedUserUpdate: parsedUserUpdate
     },
+  })
+}
+
+export const refreshPosts = () => (dispatch) => {
+  dispatch({
+    type: Types.REFRESH_POSTS
   })
 }

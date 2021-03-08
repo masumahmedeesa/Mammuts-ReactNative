@@ -23,7 +23,7 @@ export default {
     left: 0,
     position: 'absolute',
     right: 0,
-    top: 35,
+    top: 0,
     zIndex: 1,
     borderWidth: 0,
     paddingHorizontal: 2,

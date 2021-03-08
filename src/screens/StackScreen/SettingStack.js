@@ -1,12 +1,13 @@
-import React from 'react';
-import Icon from 'react-native-vector-icons/Feather';
-import {createStackNavigator} from '@react-navigation/stack';
+import React from 'react'
+import Icon from 'react-native-vector-icons/Feather'
+import {createStackNavigator} from '@react-navigation/stack'
 
-import SettingScreen from '../SettingScreen';
-// import PrivacyScreen from '../privacy';
+import SettingScreen from './SettingScreen'
+import PrivacyScreen from './privacy'
+import TermsScreen from './terms'
+import CopyrightScreen from './copyright'
 
-
-const SettingStack = createStackNavigator();
+const SettingStack = createStackNavigator()
 
 const SettingStackScreen = ({navigation}) => (
   <SettingStack.Navigator
@@ -20,7 +21,7 @@ const SettingStackScreen = ({navigation}) => (
       name="Setting"
       component={SettingScreen}
       options={{
-        title: 'Dedicato A Maddalena',
+        title: 'Chi siamo',
         headerTintColor: 'rgb(0,184,249)',
         headerLeft: () => (
           <Icon.Button
@@ -28,13 +29,39 @@ const SettingStackScreen = ({navigation}) => (
             backgroundColor="#000000"
             color="hotpink"
             onPress={() => {
-              navigation.openDrawer();
+              navigation.openDrawer()
             }}></Icon.Button>
         ),
       }}
     />
-
+    <SettingStack.Screen
+      name="Privacy"
+      component={PrivacyScreen}
+      options={{
+        title: 'Privacy Policy',
+        headerTintColor: '#fff',
+        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
+      }}
+    />
+    <SettingStack.Screen
+      name="Terms"
+      component={TermsScreen}
+      options={{
+        title: 'Termini E Condizioni',
+        headerTintColor: '#fff',
+        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
+      }}
+    />
+    <SettingStack.Screen
+      name="Copyright"
+      component={CopyrightScreen}
+      options={{
+        title: 'Copyright',
+        headerTintColor: '#fff',
+        headerTitleStyle: {color: Platform.OS == 'ios' ? '#000000' : '#fff'},
+      }}
+    />
   </SettingStack.Navigator>
-);
+)
 
-export default SettingStackScreen;
+export default SettingStackScreen

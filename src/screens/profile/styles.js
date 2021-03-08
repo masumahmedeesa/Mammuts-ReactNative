@@ -130,4 +130,11 @@ export default {
     flexDirection: 'row',
     // borderRadius: 10
   },
+
+  imageLoader: {
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    flex: 1,
+  },
 }

@@ -11,7 +11,7 @@ function searchReducer(state = initialState, action) {
       return {
         ...state,
         allusers: action.payload.allusers,
-        error: {}
+        error: {},
       }
     }
     case Types.SEARCH_ERROR:
@@ -19,6 +19,12 @@ function searchReducer(state = initialState, action) {
         ...state,
         error: action.payload.error,
       }
+    case Types.REFRESH_USERS: {
+      return {
+        allusers: [],
+        error: {},
+      }
+    }
     default:
       return state
   }
