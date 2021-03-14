@@ -149,7 +149,7 @@ class IndividualClass extends React.Component {
                 user={user}
               />
             ) : tabView === 'connect' ? (
-              <Connect navigation={navigation} />
+              <Connect navigation={navigation} user={user}/>
             ) : null}
           </View>
         </ScrollView>

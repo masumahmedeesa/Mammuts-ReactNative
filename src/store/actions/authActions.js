@@ -28,6 +28,7 @@ export const loginAction = (user) => (dispatch) => {
   Axios.post(URLS.LOGIN, user)
     .then((response) => {
       let {token_type, access_token, user, message} = response.data
+      
       if (!message) {
         let actual_token = token_type + ' ' + access_token
         storeData('authToken', actual_token)
@@ -58,12 +59,6 @@ export const loginAction = (user) => (dispatch) => {
           error: gg[0],
         },
       })
-      // dispatch({
-      // 	type: Types.USER_ERROR,
-      // 	payload: {
-      // 		error: error.response.data.message,
-      // 	},
-      // })
     })
 }
 

@@ -100,6 +100,7 @@ class IndividualEachPost extends React.Component {
               ) : comments.audio ? (
                 <View style={{paddingTop: 2, paddingBottom: 2}}>
                   {obj.url && <SoundPlayer soundInfo={obj} />}
+                  {/* {obj.url && <ExpoPlayer soundInfo={obj} />} */}
                 </View>
               ) : (
                 <Text style={{color: 'silver'}}>
@@ -344,32 +345,42 @@ class IndividualEachPost extends React.Component {
               </View>
             </View>
 
-            <View style={{flexDirection: 'row', paddingTop: 9}}>
-              <Icon
-                name="map-pin"
-                color="rgb(0,184,249)"
-                style={{fontSize: 18}}
-              />
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: '400',
-                  color: 'silver',
-                  marginLeft: 5,
-                }}>
-                {name}
-              </Text>
-            </View>
+            {name ? (
+              <View style={{flexDirection: 'row', paddingTop: 9}}>
+                <Icon
+                  name="map-pin"
+                  color="rgb(0,184,249)"
+                  style={{fontSize: 18}}
+                />
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: '400',
+                    color: 'silver',
+                    marginLeft: 5,
+                  }}>
+                  {name}
+                </Text>
+              </View>
+            ) : (
+              <View />
+            )}
 
-            <View
-              style={{
-                paddingLeft: 2,
-                paddingTop: 8,
-                paddingBottom: 8,
-                flex: 1,
-              }}>
-              <Text style={{fontSize: 14, color: 'white'}}>{description}</Text>
-            </View>
+            {description ? (
+              <View
+                style={{
+                  paddingLeft: 2,
+                  paddingTop: 8,
+                  paddingBottom: 8,
+                  flex: 1,
+                }}>
+                <Text style={{fontSize: 14, color: 'white'}}>
+                  {description}
+                </Text>
+              </View>
+            ) : (
+              <View />
+            )}
 
             {soundIsExist.length > 0 && (
               <View style={{paddingTop: 6, paddingBottom: 6}}>

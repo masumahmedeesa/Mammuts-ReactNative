@@ -121,6 +121,8 @@ class SigninScreen extends React.Component {
       return
     }
 
+    // console.log(email, password)
+
     this.props.showLoading()
     this.props.loginAction(
       {
@@ -194,7 +196,7 @@ class SigninScreen extends React.Component {
             <TextInput
               placeholder="Password"
               placeholderTextColor="grey"
-              returnKeyType="done"
+              returnKeyType="go"
               autoCapitalize="none"
               blurOnSubmit={false}
               secureTextEntry={secureTextEntry ? true : false}

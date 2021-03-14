@@ -20,6 +20,7 @@ class App extends React.Component {
 
   render() {
     // console.log('appjs',this.props.auth)
+    // switchNavigator
     const {isAuthenticated} = this.props.auth
     return (
       <React.Fragment>

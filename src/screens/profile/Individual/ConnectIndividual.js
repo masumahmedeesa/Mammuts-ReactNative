@@ -8,7 +8,6 @@ import ImageGod from '../../../components/ImageGod'
 import styles from '../styles'
 
 class ConnectIndividual extends React.Component {
-
   addLegami = (cfKey) => {
     Alert.alert(
       'INSERISCI!',
@@ -49,7 +48,8 @@ class ConnectIndividual extends React.Component {
 
   renderIndividualPeople = (item) => {
     const {nome, cognome, image_profile, email} = item
-    const {legamies} = this.props
+    const {legamies, otherLevel, user, navigation} = this.props
+    const parsedLevel = JSON.parse(otherLevel)
     let flag = false
     const dd = Date.now() + item.id
     const legamiView = legamies.map((l) => {
@@ -74,7 +74,16 @@ class ConnectIndividual extends React.Component {
           flexDirection: 'row',
         }}>
         <TouchableOpacity
-          // onPress={() => navigation.navigate('Individual', {info: item})}
+          onPress={() => {
+            if (parsedLevel.id == item.id) {
+              navigation.navigate('Profile')
+            } else if(user.id == item.id){
+              // do nothing
+            }
+            else {
+              navigation.navigate('Other', {user: item})
+            }
+          }}
           style={{flex: 8}}>
           <View style={{flexDirection: 'row'}}>
             <View style={{flex: 1, paddingRight: 5}}>
@@ -154,6 +163,7 @@ function mapStateToProps(state) {
   return {
     legami: state.individual.legami,
     legamies: state.posts.legami,
+    otherLevel: state.auth.user
   }
 }
 

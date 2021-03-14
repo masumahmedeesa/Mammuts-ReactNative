@@ -10,7 +10,7 @@ import {
   FlatList,
   SafeAreaView,
   LogBox,
-  Platform
+  Platform,
 } from 'react-native'
 import Axios from 'axios'
 import ImagePicker from 'react-native-image-crop-picker'
@@ -27,8 +27,14 @@ import {showLoading, hideLoading} from '../../store/actions/supportActions'
 // import {getAllUsers} from '../../store/actions/searchActions'
 import {postCreate, legamiCollection} from '../../store/actions/postActions'
 import {removeAudio} from '../../store/actions/audioActions'
-import Record from './Record/record'
+// import Record from './Record/record'
+// import DumyPlayer from './Record/DumyPlayer'
 // import RecorPlayer from './Record/RecordPlayer'
+// import { Constants } from 'react-native-unimodules';
+// console.log(Constants.systemFonts);
+// import ExpoPlayer from '../expo/ExpoPlayer'
+// import ExpoRecorder from '../expo/ExpoRecorder'
+import RecordPlayer from '../expo/RecordPlayer'
 
 class MemeScreen extends React.Component {
   constructor(props) {
@@ -53,7 +59,7 @@ class MemeScreen extends React.Component {
     LogBox.ignoreLogs(['VirtualizedLists should never be nested'])
     const {audio} = this.props
     this.props.showLoading()
-    if (audio.formdata) {
+    if (JSON.stringify(audio.formdata) !== JSON.stringify({})) {
       this.props.removeAudio()
     }
     this.props.hideLoading()
@@ -81,9 +87,6 @@ class MemeScreen extends React.Component {
       method: 'POST',
       url: url,
       data: data,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-    }
     })
     return response.data
   }
@@ -105,7 +108,7 @@ class MemeScreen extends React.Component {
       try {
         this.props.showLoading()
         const fileName = image.path.split('/')
-        // everything is fine
+        // console.log(image.path)
         const data = new FormData()
         data.append('file', {
           uri: image.path,
@@ -261,7 +264,7 @@ class MemeScreen extends React.Component {
   }
 
   onPressedAuto = (item) => {
-    console.log('clicked')
+    // console.log('clicked')
     this.setState({query: item.nome + ' ' + item.cognome})
   }
 
@@ -330,7 +333,7 @@ class MemeScreen extends React.Component {
   }
 
   renderSearchedItem = ({item}) => {
-    // console.log(item)
+    // console.log(item.nome)
     if (item) {
       const dd = Date.now() + item.cf_key
       return (
@@ -370,17 +373,22 @@ class MemeScreen extends React.Component {
 
     this.props.showLoading()
     let cc
-    if (audio.formdata) {
+    let audioFileName = ''
+    if (JSON.stringify(audio.formdata) !== JSON.stringify({})) {
+      // console.log(audio.formdata._parts, 'ashse')
       try {
         cc = await this.uploadData(audio.formdata, URLS.UPLOAD_AUDIO)
+        audioFileName = cc.audio.substring(6, cc.audio.length)
       } catch (e) {
         this.props.hideLoading()
         console.log(e, 'submitHandler uploading audio')
       }
     }
 
+    // console.log(audioFileName ? audioFileName: 'audifileNAI')
+
     const tags = selectedUser.map((single) => single.id)
-    let audioFileName = cc.audio.substring(6, cc.audio.length)
+
     let res
     try {
       res = await this.uploadAllKindsOfData({
@@ -390,6 +398,7 @@ class MemeScreen extends React.Component {
         place: dove,
         description: racconta,
         file: uploadedImageList ? uploadedImageList : [],
+        // empty array na pathaiye hoito empty string pathaile valo
         audio: audioFileName ? audioFileName : [],
       })
     } catch (e) {
@@ -401,7 +410,6 @@ class MemeScreen extends React.Component {
     const user = JSON.parse(this.props.auth.user)
     this.props.postCreate(res, user)
 
-    // console.log('ashse')
     if (res) {
       this.setState({
         isEnable: false,
@@ -414,15 +422,10 @@ class MemeScreen extends React.Component {
         selectedUser: [],
         query: '',
       })
-      if (audio.formdata) {
+      if (JSON.stringify(audio.formdata) !== JSON.stringify({})) {
         this.props.removeAudio()
       }
       Toast.show('La tua memoria è stata caricata con successo!', Toast.LONG)
-      // setTimeout(() => {
-      //   // console.log('hello')
-      // }, 400)
-      // this.toast.show('La tua memoria è stata caricata con successo!', 800)
-      // console.log('ashse2')
       navigation.navigate('Profile')
     } else {
       Toast.show('Errore di connessione a Internet :(', Toast.LONG)
@@ -432,6 +435,7 @@ class MemeScreen extends React.Component {
   render() {
     const {isEnable, query, selectedUser, dove, racconta} = this.state
     // console.log(uploadedImageList, 'uploadedImageList')
+    // console.log(this.props.search)
 
     const filteredUsers = this.findUser(query)
     const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim()
@@ -439,18 +443,18 @@ class MemeScreen extends React.Component {
     return (
       <View style={{flex: 1, backgroundColor: '#000000'}}>
         <ScrollView style={styles.container} keyboardShouldPersistTaps="always">
-          <View style={{marginTop: 10}}>
-            <View style={styles.newStyle}>
-              <Text style={styles.textNew}>Tagga un tuo legame</Text>
+          {Platform.OS === 'android' && (
+            <View style={{marginTop: 10}}>
+              <View style={styles.newStyle}>
+                <Text style={styles.textNew}>Tagga un tuo legame</Text>
+              </View>
             </View>
-          </View>
-          <View style={{marginTop: Platform.OS === "ios" ? 47 : 25}} />
+          )}
+          <View style={{marginTop: Platform.OS === 'ios' ? 47 : 25}} />
           <View style={styles.containerAuto}>
             <Autocomplete
               autoCapitalize="none"
               autoCorrect={false}
-              // inputContainerStyle={styles.autocompleteContainer}
-              // containerStyle={styles.autocompleteContainer}
               data={
                 filteredUsers.length === 1 && comp(query, filteredUsers[0].nome)
                   ? []
@@ -467,8 +471,6 @@ class MemeScreen extends React.Component {
               // renderItem={(single) => this.renderSearchedItem(single)}
             />
           </View>
-
-          {selectedUser.length > 0 && <View style={{marginTop: Platform.OS === "ios" ? 15 : 0}} />}
 
           {selectedUser.length > 0 ? this.renderUsers() : <View />}
 
@@ -546,9 +548,8 @@ class MemeScreen extends React.Component {
           </View>
 
           <View style={styles.foto}>
-            <View style={{paddingBottom: 5}}>
-              <Record />
-              {/* <RecorPlayer /> */}
+            <View>
+              <RecordPlayer />
             </View>
           </View>
 
@@ -579,7 +580,7 @@ class MemeScreen extends React.Component {
               </View>
             </View>
           </View>
-          
+
           {dove.length > 0 && racconta.length > 0 ? (
             <TouchableOpacity onPress={this.submitHandler}>
               <View style={styles.publiccaView}>
@@ -619,7 +620,8 @@ export default connect(mapStateToProps, {
 })(MemeScreenFunction)
 
 /// ios AutoComplete
-{/* <Autocomplete
+{
+  /* <Autocomplete
 autoCapitalize="none"
 autoCorrect={false}
 // inputContainerStyle={styles.autocompleteContainer}
@@ -637,7 +639,8 @@ placeholder="Tagga un tuo legame"
 //   <Text>{single.nome}</Text>
 // </ListItem>}
 renderItem={(single) => this.renderSearchedItem(single)}
-/> */}
+/> */
+}
 /* <TextInput
                 name="tagga"
                 placeholder={'Tagga un tuo legame'}

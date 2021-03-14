@@ -24,11 +24,14 @@ import {
   loadComments,
   uploadComment,
   removeComment,
-  refreshComment
+  refreshComment,
 } from '../../store/actions/commentActions'
 import {postDelete} from '../../store/actions/postActions'
 import SoundPlayer from '../profile/SoundPlayer'
-import Record from '../Meme/Record/record'
+import RecordPlayer from '../expo/RecordPlayer'
+// import ExpoPlayer from '../expo/ExpoPlayer'
+// import Record from '../Meme/Record/record'
+// import DumyPlayer from '../Meme/Record/DumyPlayer'
 import styles from './styles'
 
 class StoryScreen extends React.Component {
@@ -44,19 +47,20 @@ class StoryScreen extends React.Component {
   componentDidMount() {
     const {audio} = this.props
     this.props.showLoading()
-    if (audio.formdata) {
+    if (JSON.stringify(audio.formdata) !== JSON.stringify({})) {
       this.props.removeAudio()
     }
+    this.props.refreshComment()
     this.loadMoreComments()
     this.props.hideLoading()
   }
 
-  componentWillUnmount(){
-    // console.log('unmount')
-    this.props.showLoading()
-    this.props.refreshComment()
-    this.props.hideLoading()
-  }
+  // componentWillUnmount(){
+  //   // console.log('unmount')
+  //   this.props.showLoading()
+  //   this.props.refreshComment()
+  //   this.props.hideLoading()
+  // }
 
   loadMoreComments = () => {
     const {data} = this.props.route.params
@@ -146,11 +150,6 @@ class StoryScreen extends React.Component {
                               user: single.user,
                             })
                           }
-                          // else if (sender === 'Individual') {
-                          //   navigation.navigate('Other', {
-                          //     user: single.user,
-                          //   })
-                          // }
                         }
                       }}>
                       <Text
@@ -192,6 +191,7 @@ class StoryScreen extends React.Component {
                   ) : single.audio ? (
                     <View style={{paddingTop: 2, paddingBottom: 2}}>
                       {obj.url && <SoundPlayer soundInfo={obj} />}
+                      {/* {obj.url && <ExpoPlayer soundInfo={obj} />} */}
                     </View>
                   ) : (
                     <Text style={{color: 'silver'}}>
@@ -385,7 +385,8 @@ class StoryScreen extends React.Component {
     const {data} = this.props.route.params
     const {id} = data
     let cc, finalRes
-    if (audio.formdata) {
+    if (JSON.stringify(audio.formdata) !== JSON.stringify({})) {
+      // console.log(audio.formdata)
       try {
         cc = await this.uploadData(audio.formdata, URLS.UPLOAD_AUDIO)
         let audioFileName = '/' + cc.audio
@@ -400,7 +401,7 @@ class StoryScreen extends React.Component {
       }
     }
     this.props.removeAudio()
-    if (finalRes.audio) {
+    if (finalRes && finalRes.audio) {
       Toast.show(
         "L'audio è stato caricato correttamente come commento.",
         Toast.LONG,
@@ -430,7 +431,10 @@ class StoryScreen extends React.Component {
 
             navigation.navigate(sender ? sender : 'Profile')
             // },800)
-            Toast.show('La memoria è stata cancellata con successo!', Toast.LONG)
+            Toast.show(
+              'La memoria è stata cancellata con successo!',
+              Toast.LONG,
+            )
           },
         },
       ],
@@ -457,7 +461,7 @@ class StoryScreen extends React.Component {
     const parsedUser = user
     // console.log(parsedUser, 'Story')
     const parsedLevel = JSON.parse(otherLevel)
-    // console.log(parsedUser,'story----')
+    // console.log(name ? name : 'nai', 'story----')
     return (
       <View style={{flex: 1, backgroundColor: '#000000'}}>
         <StatusBar barStyle="light-content" />
@@ -475,10 +479,7 @@ class StoryScreen extends React.Component {
               </Text>
               {/* Jump to the personal profile */}
               {bondnames === 'Logged user' ? (
-                <TouchableOpacity
-                  style={{paddingLeft: 5}}
-                  // onPress={() => navigation.navigate('Profile')}
-                >
+                <TouchableOpacity style={{paddingLeft: 5}}>
                   <Text
                     style={{
                       fontSize: 16,
@@ -611,36 +612,44 @@ class StoryScreen extends React.Component {
             )}
           </View>
 
-          <View style={styles.firstColumn}>
-            <View style={{paddingLeft: 4, marginTop: 5}}>
-              <View style={{flexDirection: 'row'}}>
-                <Icon
-                  name="map-pin"
-                  color="rgb(0,184,249)"
-                  style={{fontSize: 19}}
-                />
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: 'white',
-                    marginLeft: 5,
-                  }}>
-                  {name}
-                </Text>
+          {name ? (
+            <View style={styles.firstColumn}>
+              <View style={{paddingLeft: 4, marginTop: 5}}>
+                <View style={{flexDirection: 'row'}}>
+                  <Icon
+                    name="map-pin"
+                    color="rgb(0,184,249)"
+                    style={{fontSize: 19}}
+                  />
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: 'white',
+                      marginLeft: 5,
+                    }}>
+                    {name}
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
+          ) : (
+            <View />
+          )}
 
-          <View
-            style={{
-              paddingLeft: 14,
-              paddingTop: 7,
-              paddingRight: 6,
-              paddingBottom: 8,
-              flex: 1,
-            }}>
-            <Text style={{fontSize: 16, color: 'white'}}>{description}</Text>
-          </View>
+          {description ? (
+            <View
+              style={{
+                paddingLeft: 14,
+                paddingTop: 7,
+                paddingRight: 6,
+                paddingBottom: 8,
+                flex: 1,
+              }}>
+              <Text style={{fontSize: 16, color: 'white'}}>{description}</Text>
+            </View>
+          ) : (
+            <View />
+          )}
 
           {soundIsExist.length > 0 ? (
             <View
@@ -658,43 +667,44 @@ class StoryScreen extends React.Component {
 
           {this.renderPictures()}
 
-          <View
-            style={[
-              styles.cardTwo,
-              {marginTop: 15, marginLeft: 10, marginRight: 10},
-            ]}>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '500',
-                color: 'rgb(0,184,249)',
-              }}>
-              Privacy Del Post
-            </Text>
-
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 3}}>
-              <Text style={{fontSize: 16, flex: 6, color: 'white'}}>
-                Abilita questa opzione per rendere il post visible solo a te
+          {parsedLevel.id == parsedUser.id && (
+            <View
+              style={[
+                styles.cardTwo,
+                {marginTop: 15, marginLeft: 10, marginRight: 10},
+              ]}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '500',
+                  color: 'rgb(0,184,249)',
+                }}>
+                Privacy Del Post
               </Text>
-              <View style={{flex: 1, paddingTop: 5, paddingRight: 5}}>
-                <Switch
-                  trackColor={{false: '#000000', true: '#fff'}}
-                  thumbColor={isEnable ? 'rgb(0,184,249)' : '#f4f3f3'}
-                  onValueChange={this.switchHandler}
-                  value={isEnable}
-                  ios_backgroundColor="#000000"
-                />
+
+              <View style={{flex: 1, flexDirection: 'row', paddingTop: 3}}>
+                <Text style={{fontSize: 16, flex: 6, color: 'white'}}>
+                  Abilita questa opzione per rendere il post visible solo a te
+                </Text>
+                <View style={{flex: 1, paddingTop: 5, paddingRight: 5}}>
+                  <Switch
+                    trackColor={{false: '#000000', true: '#fff'}}
+                    thumbColor={isEnable ? 'rgb(0,184,249)' : '#f4f3f3'}
+                    onValueChange={this.switchHandler}
+                    value={isEnable}
+                    ios_backgroundColor="#000000"
+                  />
+                </View>
               </View>
             </View>
-          </View>
+          )}
 
           <View style={[styles.cardW, {marginTop: 30}]}>
             <Text style={{fontSize: 20, fontWeight: '500', color: 'silver'}}>
               Commento
             </Text>
           </View>
-
-          {this.commentSection()}
+          <View>{this.commentSection()}</View>
 
           <View
             style={{
@@ -737,7 +747,7 @@ class StoryScreen extends React.Component {
           <View style={styles.universal}>
             <View style={styles.foto}>
               <View>
-                <Record />
+                <RecordPlayer />
               </View>
             </View>
           </View>

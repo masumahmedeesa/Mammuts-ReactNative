@@ -69,6 +69,7 @@ class SoundPlayer extends React.Component {
   soundLoad = () => {
     this.setState({loadButton: true})
     const {soundInfo} = this.props
+    console.log(soundInfo.url)
     const callback = (error, sound) => {
       if (error) {
         this.setState({error: 'error'})
@@ -87,7 +88,7 @@ class SoundPlayer extends React.Component {
       soundInfo.onPrepared && soundInfo.onPrepared(sound)
     }
 
-    this.props.showLoading()
+    // this.props.showLoading()
     if (soundInfo.isRequire) {
       const sound = new Sound(soundInfo.url, (error) => callback(error, sound))
     } else {
@@ -95,7 +96,7 @@ class SoundPlayer extends React.Component {
         callback(error, sound),
       )
     }
-    this.props.hideLoading()
+    // this.props.hideLoading()
   }
 
   componentWillUnmount() {

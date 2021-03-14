@@ -110,12 +110,15 @@ function postReducer(state = initialState, action) {
 
       const parsedUser = action.payload.parsedUserUpload
       let createdData = action.payload.createdData
+      // console.log(createdData)
       // const lastData = [action.payload.createdData, ...state.posts]
       // const lastData = [action.payload.createdData].concat(data)
 
       let obj = {}
       obj['title'] = 'wav remote download'
+      // console.log(createdData.audio, 'audio')
       let genjam = createdData.audio ? createdData.audio : 'nope'
+      // console.log(genjam, 'genjam')
       obj['url'] = 'https://mammuts.it/vocal/' + genjam
 
       let picturesJJ = []

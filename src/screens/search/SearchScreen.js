@@ -29,6 +29,10 @@ class SearchScreenClass extends React.Component {
   componentDidMount() {
     this.props.showLoading()
     this.props.getAllUsers()
+    // const user = JSON.parse(this.props.auth.user)
+    // if (user) {
+    //   this.props.legamiCollection(user.id)
+    // }
     this.props.hideLoading()
   }
 
@@ -214,7 +218,7 @@ class SearchScreenClass extends React.Component {
                       onPress={() =>
                         navigation.navigate('Individual', {user: single})
                       }
-                      style={{flex: 6, paddingTop: 2}}>
+                      style={{flex: 6, paddingTop: 2, paddingLeft: 4}}>
                       <Text style={styles.normalText}>
                         {nome + ' ' + cognome}
                       </Text>

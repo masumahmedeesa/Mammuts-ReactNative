@@ -23,16 +23,18 @@ import {
   Recorder,
   MediaStates,
 } from '@react-native-community/audio-toolkit'
+// import SoundPlayer from '../../profile/SoundPlayer'
 // import {useNavigation} from '@react-navigation/native'
 // import {showLoading, hideLoading} from '../../../store/actions/supportActions'
 import {getAudioFormData} from '../../../store/actions/audioActions'
-import {URLS} from '../../../config/urls'
+// import {URLS} from '../../../config/urls'
 import styles from './styles'
 // import RecordPlayer from './RecordPlayer'
 
 const filename = 'mammuts.aac'
 
 class Record extends Component {
+  _isMounted = false
   player: Player | null
   recorder: Recorder | null
   lastSeek: number
@@ -56,15 +58,18 @@ class Record extends Component {
 
       error: null,
 
-      isPressed: false,
-      animated: new Animated.Value(0),
-      opacityA: new Animated.Value(1),
+      // lastSeek: 0,
+      // isPressed: false,
+      // animated: new Animated.Value(0),
+      // opacityA: new Animated.Value(1),
 
       // uploadedList: [],
     }
   }
 
   componentDidMount() {
+    this._isMounted = true
+    // console.log('mount record')
     this.player = null
     this.recorder = null
     this.lastSeek = 0
@@ -90,12 +95,19 @@ class Record extends Component {
   }
 
   componentWillUnmount() {
+    // console.log('unmount')
+    this._isMounted = false
+    this.setState = (state, callback) => {
+      return
+    }
     clearInterval(this._progressInterval)
   }
 
   _shouldUpdateProgressBar() {
     // Debounce progress bar update by 200 ms
     return Date.now() - this.lastSeek > 200
+    // let gg = Date.now() - this.state.lastSeek > 200
+    // return gg
   }
 
   _updateState(err) {
@@ -136,9 +148,7 @@ class Record extends Component {
     }
 
     this.lastSeek = Date.now()
-
     let position = percentage * this.player.duration
-    // console.log("position")
     this.player.seek(position, () => {
       this._updateState()
     })
@@ -153,11 +163,12 @@ class Record extends Component {
       autoDestroy: false,
     }).prepare((err) => {
       if (err) {
-        console.log('error at _reloadPlayer():')
-        console.log(err)
-      } else {
-        this.player.looping = this.state.loopButtonStatus
+        console.log('error at _reloadPlayer():', err)
+        // console.log(err)
       }
+      // else {
+      //   this.player.looping = this.state.loopButtonStatus
+      // }
 
       this._updateState()
     })
@@ -176,12 +187,13 @@ class Record extends Component {
     if (this.recorder) {
       this.recorder.destroy()
     }
-
+    
     this.recorder = new Recorder(filename, {
-      bitrate: 256000,
-      channels: 2,
-      sampleRate: 44100,
-      quality: 'max',
+      // bitrate: 256000,
+      // channels: 2,
+      // sampleRate: 44100,
+      quality: 'medium',
+      encoder: 'webm'
     })
 
     this._updateState()
@@ -206,8 +218,6 @@ class Record extends Component {
     if (this.player) {
       this.player.destroy()
     }
-
-    // this.setState({isPressed: !this.state.isPressed})
 
     let recordAudioRequest
     if (Platform.OS == 'android') {
@@ -234,6 +244,7 @@ class Record extends Component {
         }
         if (stopped) {
           const audioPath = this.recorder._fsPath
+          console.log(audioPath)
           const data = new FormData()
           data.append('audio', {
             uri: audioPath,
@@ -242,25 +253,6 @@ class Record extends Component {
             // type: 'multipart/form-data',
           })
           this.props.getAudioFormData(data)
-          // let cc
-          // try {
-          //   cc = await this.uploadData(data, URLS.UPLOAD_AUDIO)
-          // } catch (e) {
-          //   console.log(e, 'audio')
-          // }
-
-          // let rmMessage = ''
-
-          // if (uploadedList.length > 0) {
-          //   try {
-          //     rmMessage = await this.removeData(uploadedList[0].split('/')[1])
-          //     const [, ...gg] = uploadedList
-          //     uploadedList = gg
-          //   } catch (e) {
-          //     console.log(e, 'remove audio')
-          //   }
-          // }
-          // this.setState({uploadedList: [...uploadedList, cc.audio]})
 
           this._reloadPlayer()
           this._reloadRecorder()
@@ -304,87 +296,35 @@ class Record extends Component {
     }
   }
 
-  _runAnimation = () => {
-    const {animated, opacityA} = this.state
-    Animated.loop(
-      Animated.parallel([
-        Animated.timing(animated, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: false,
-        }),
-        Animated.timing(opacityA, {
-          toValue: 0,
-          duration: 1000,
-          useNativeDriver: false,
-        }),
-      ]),
-    ).start()
-  }
-  
-  _stopAnimation = () => {
-    Animated.loop(
-      Animated.parallel([Animated.timing(animated), Animated.timing(opacityA)]),
-    ).stop()
-  }
-
-  _micButton() {
-    const {isPressed, animated, opacityA} = this.state
-    if (isPressed) {
-      // this._runAnimation()
-      console.log('micButton')
-      return (
-        <Animated.View
-          style={{
-            width: 80,
-            height: 80,
-            borderRadius: 50,
-            backgroundColor: 'rgb(0,184,249)',
-            opacity: opacityA,
-            transform: [
-              {
-                scale: animated,
-              },
-            ],
-          }}>
-          <View style={{alignItems: 'center', marginTop: 30}}>
-            <Text style={{fontWeight: '600'}}>Recording</Text>
-          </View>
-        </Animated.View>
-      )
-    } else {
-      //some function
-      return (
-        <View
-          style={{
-            width: 80,
-            height: 80,
-            borderRadius: 50,
-            backgroundColor: 'rgb(0,184,249)',
-          }}>
-          <View style={{alignItems: 'center', marginTop: 13}}>
-            <Icon name="mic" style={{fontSize: 50}} />
-          </View>
-        </View>
-      )
-    }
-  }
-
   render() {
     const {audio} = this.props
-    const {duration, currentTime} = this.state
-    if(audio.formdata === "{}"){
-      console.log(audio.formdata)
-    }
+    const {duration, currentTime, progress} = this.state
+    // console.log('dddd')
+    // console.log(progress)
+    // if(audio.formdata === "{}"){
+    //   console.log(audio.formdata)
+    // }
+    // console.log(audio.formdata ? audio.formdata._parts : 'nai')
     return (
       <View>
+       
         <View style={styles.recordingAnime}>
           <View style={{alignItems: 'center', justifyContent: 'center'}}>
             <TouchableHighlight
               style={{paddingTop: 5}}
               onPress={() => this._toggleRecord()}
               disabled={this.state.recordButtonDisabled}>
-              {this._micButton()}
+              <View
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: 50,
+                  backgroundColor: 'rgb(0,184,249)',
+                }}>
+                <View style={{alignItems: 'center', marginTop: 13}}>
+                  <Icon name="mic" style={{fontSize: 50}} />
+                </View>
+              </View>
             </TouchableHighlight>
           </View>
           {Platform.OS === 'android' && <View style={{paddingTop: 15}} />}
@@ -395,9 +335,11 @@ class Record extends Component {
             onPress={() => this._toggleRecord()}
           />
         </View>
-        {audio.formdata._parts ? (
+        {JSON.stringify(audio.formdata) !== JSON.stringify({}) &&
+        audio.formdata._parts ? (
           <View style={styles.recordingAnime}>
             <View style={styles.slider}>
+            
               <Slider
                 step={0.0001}
                 disabled={this.state.playButtonDisabled}
@@ -438,7 +380,7 @@ class Record extends Component {
                 </TouchableOpacity>
               )}
             </View>
-            <View style={{paddingBottom: 8}} />
+            {/* <View style={{paddingBottom: 8}} />
             <View style={styles.settingsContainer}>
               <Text style={{color: '#EFF', paddingRight: 5}}>
                 Ciclo continuo
@@ -447,7 +389,7 @@ class Record extends Component {
                 onValueChange={(value) => this._toggleLooping(value)}
                 value={this.state.loopButtonStatus}
               />
-            </View>
+            </View> */}
             <View style={{paddingBottom: 8}} />
           </View>
         ) : (
@@ -469,7 +411,72 @@ function mapStateToProps(state) {
 }
 
 export default connect(mapStateToProps, {getAudioFormData})(Record)
+
 // export default Record
 
 // Rocording information
 // {"_duration": -1, "_fsPath": "/Users/masumahmed/Library/Developer/CoreSimulator/Devices/B24DB460-6B91-4975-86F4-BA54E18761BF/data/Containers/Data/Application/0EB08A1C-A88C-470A-8A03-D744D680E9C0/Documents/mm.aac", "_lastSync": -1, "_options": {"bitrate": 256000, "channels": 2, "quality": "max", "sampleRate": 44100}, "_path": "mm.aac", "_position": -1, "_recorderId": 20, "_state": -2}
+// _stopAnimation = () => {
+//   Animated.loop(
+//     Animated.parallel([Animated.timing(animated), Animated.timing(opacityA)]),
+//   ).stop()
+// }
+
+// _runAnimation = () => {
+//   const {animated, opacityA} = this.state
+//   Animated.loop(
+//     Animated.parallel([
+//       Animated.timing(animated, {
+//         toValue: 1,
+//         duration: 1000,
+//         useNativeDriver: false,
+//       }),
+//       Animated.timing(opacityA, {
+//         toValue: 0,
+//         duration: 1000,
+//         useNativeDriver: false,
+//       }),
+//     ]),
+//   ).start()
+// }
+// _micButton() {
+//   const {isPressed, animated, opacityA} = this.state
+//   if (isPressed) {
+//     // this._runAnimation()
+//     console.log('micButton')
+//     return (
+//       <Animated.View
+//         style={{
+//           width: 80,
+//           height: 80,
+//           borderRadius: 50,
+//           backgroundColor: 'rgb(0,184,249)',
+//           opacity: opacityA,
+//           transform: [
+//             {
+//               scale: animated,
+//             },
+//           ],
+//         }}>
+//         <View style={{alignItems: 'center', marginTop: 30}}>
+//           <Text style={{fontWeight: '600'}}>Recording</Text>
+//         </View>
+//       </Animated.View>
+//     )
+//   } else {
+//     //some function
+//     return (
+//       <View
+//         style={{
+//           width: 80,
+//           height: 80,
+//           borderRadius: 50,
+//           backgroundColor: 'rgb(0,184,249)',
+//         }}>
+//         <View style={{alignItems: 'center', marginTop: 13}}>
+//           <Icon name="mic" style={{fontSize: 50}} />
+//         </View>
+//       </View>
+//     )
+//   }
+// }

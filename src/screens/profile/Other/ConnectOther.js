@@ -48,7 +48,8 @@ class ConnectOther extends React.Component {
 
   renderIndividualPeople = (item) => {
     const {nome, cognome, image_profile, email} = item
-    const {legamies} = this.props
+    const {legamies, otherLevel, navigation, user} = this.props
+    const parsedLevel = JSON.parse(otherLevel)
     let flag = false
     const dd = Date.now() + item.id
     const legamiView = legamies.map((l) => {
@@ -73,7 +74,15 @@ class ConnectOther extends React.Component {
           flexDirection: 'row',
         }}>
         <TouchableOpacity
-          // onPress={() => navigation.navigate('Individual', {info: item})}
+          onPress={() => {
+            if (parsedLevel.id == item.id) {
+              navigation.navigate('Profile')
+            } else if (user.id == item.id) {
+              // do nothing
+            } else {
+              navigation.navigate('Individual', {user: item})
+            }
+          }}
           style={{flex: 8}}>
           <View style={{flexDirection: 'row'}}>
             <View style={{flex: 1, paddingRight: 5}}>
@@ -153,6 +162,7 @@ function mapStateToProps(state) {
   return {
     legami: state.other.legami,
     legamies: state.posts.legami,
+    otherLevel: state.auth.user,
   }
 }
 
@@ -161,6 +171,5 @@ export default connect(mapStateToProps, {
   showLoading,
   hideLoading,
 })(ConnectOther)
-
 
 // navigation.navigate('Individual', {info: item})

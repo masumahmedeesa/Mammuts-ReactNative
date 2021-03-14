@@ -4,16 +4,9 @@ import {
   TextInput,
   View,
   TouchableOpacity,
-  Dimensions,
-  Image,
-  StyleSheet,
   StatusBar,
   Alert,
-  Modal,
-  TouchableHighlight,
-  Button,
   ScrollView,
-  // Option
 } from 'react-native'
 import {useNavigation} from '@react-navigation/native'
 import {connect} from 'react-redux'

@@ -5,10 +5,10 @@ import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/Feather'
 import * as Animatable from 'react-native-animatable'
 
+// import ToolkitPlayer from '../expo/ToolkitPlayer'
 import {ricodioActions, legamiCollection} from '../../store/actions/postActions'
 import {showLoading, hideLoading} from '../../store/actions/supportActions'
 import styles from './styles'
-
 
 class HomeScreen extends React.Component {
   componentDidMount() {
@@ -233,5 +233,5 @@ export default connect(mapStateToProps, {
   ricodioActions,
   showLoading,
   hideLoading,
-  legamiCollection
+  legamiCollection,
 })(HomeScreenFunction)

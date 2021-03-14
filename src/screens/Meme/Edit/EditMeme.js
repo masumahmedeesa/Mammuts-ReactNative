@@ -17,7 +17,7 @@ import ImagePicker from 'react-native-image-crop-picker'
 import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/Feather'
 import {useNavigation} from '@react-navigation/native'
-import Autocomplete from 'native-base-autocomplete'
+import Autocomplete from 'react-native-autocomplete-input'
 import ImageGod from '../../../components/ImageGod'
 import SoundPlayer from '../../profile/SoundPlayer'
 import Toast from 'react-native-simple-toast'
@@ -26,7 +26,8 @@ import {URLS} from '../../../config/urls'
 import {showLoading, hideLoading} from '../../../store/actions/supportActions'
 import {legamiCollection, postUpdate} from '../../../store/actions/postActions'
 import {removeAudio} from '../../../store/actions/audioActions'
-import Record from '../Record/record'
+// import Record from '../Record/record'
+import RecordPlayer from '../../expo/RecordPlayer'
 
 class EditMemeScreen extends React.Component {
   constructor(props) {
@@ -45,6 +46,7 @@ class EditMemeScreen extends React.Component {
       newSelectedUser: [], // for newly added
       query: '',
     }
+    // console.log(this.props.route.params.data.soundInfo)
     this.selectImage = this.selectImage.bind(this)
     this.renderGalleryItem = this.renderGalleryItem.bind(this)
   }
@@ -53,7 +55,6 @@ class EditMemeScreen extends React.Component {
     LogBox.ignoreLogs(['VirtualizedLists should never be nested'])
     const user = JSON.parse(this.props.auth.user)
     const {audio} = this.props
-    // const {imageList} = this.state
     let nList = this.props.route.params.images
     this.props.showLoading()
     if (nList.length > 0) {
@@ -71,9 +72,9 @@ class EditMemeScreen extends React.Component {
     }
     if (user) {
       // console.log(user.cf_key)
-      this.props.legamiCollection(user.cf_key)
+      this.props.legamiCollection(user.id)
     }
-    if (audio.formdata) {
+    if (JSON.stringify(audio.formdata) !== JSON.stringify({})) {
       this.props.removeAudio()
     }
     this.props.hideLoading()
@@ -207,12 +208,6 @@ class EditMemeScreen extends React.Component {
           imageUrl={suitableName}
           borderRadius={10}
         />
-        {/* <Image
-          source={{uri: suitableName}}
-          style={styles.photoThumb}
-          // onLoadStart={() => this.props.showLoading()}
-          // onLoadEnd={() => this.props.hideLoading()}
-        /> */}
         <TouchableOpacity
           style={styles.photo}
           onPress={() => this.onRemoveGalleryImage(index, item)}>
@@ -265,6 +260,7 @@ class EditMemeScreen extends React.Component {
   }
 
   onPressedAuto = (item) => {
+    // console.log(item)
     this.setState({query: item.nome + ' ' + item.cognome})
   }
 
@@ -318,7 +314,7 @@ class EditMemeScreen extends React.Component {
                 <View style={{flexDirection: 'row'}}>
                   <View style={{flex: 1, paddingRight: 5}}>
                     <ImageGod
-                      propWidth={'100%'}
+                      propWidth={45}
                       propHeight={45}
                       imageUrl={
                         image_profile
@@ -327,17 +323,6 @@ class EditMemeScreen extends React.Component {
                       }
                       borderRadius={50}
                     />
-                    {/* {image_profile ? (
-                      <Image
-                        source={{uri: 'https://mammuts.it/' + image_profile}}
-                        style={{width: '100%', height: 45, borderRadius: 50}}
-                      />
-                    ) : (
-                      <Image
-                        source={require('../../../../assets/images/cat.jpeg')}
-                        style={{width: '100%', height: 45, borderRadius: 50}}
-                      />
-                    )} */}
                   </View>
                   <View style={{flex: 6, paddingTop: 2}}>
                     <Text
@@ -367,7 +352,8 @@ class EditMemeScreen extends React.Component {
     )
   }
 
-  renderSearchedItem = (item) => {
+  renderSearchedItem = ({item}) => {
+    // console.log(item.nome)
     if (item) {
       const dd = Date.now() + item.cf_key
       return (
@@ -413,17 +399,16 @@ class EditMemeScreen extends React.Component {
     const {sender} = this.props.route.params
 
     this.props.showLoading()
-    let cc, audioFileName
-    if (audio.formdata) {
+    let cc
+    let audioFileName = ''
+    if (JSON.stringify(audio.formdata) !== JSON.stringify({})) {
       try {
         cc = await this.uploadData(audio.formdata, URLS.UPLOAD_AUDIO)
+        audioFileName = cc.audio.substring(6, cc.audio.length)
       } catch (e) {
         this.props.hideLoading()
         console.log(e, 'submitHandler uploading audio')
       }
-    }
-    if (cc) {
-      audioFileName = cc.audio.substring(6, cc.audio.length)
     }
     if (audioInfo.url) {
       if (audioInfo.url.length > 33) {
@@ -456,7 +441,7 @@ class EditMemeScreen extends React.Component {
       this.props.hideLoading()
       console.warn(e, 'main uploading')
     }
-    if (audio.formdata) {
+    if (JSON.stringify(audio.formdata) !== JSON.stringify({})) {
       this.props.removeAudio()
     }
     this.props.hideLoading()
@@ -546,7 +531,7 @@ class EditMemeScreen extends React.Component {
         return (
           <View style={styles.foto}>
             <View style={{paddingBottom: 5}}>
-              <Record />
+              <RecordPlayer/>
             </View>
           </View>
         )
@@ -555,7 +540,7 @@ class EditMemeScreen extends React.Component {
       return (
         <View style={styles.foto}>
           <View style={{paddingBottom: 5}}>
-            <Record />
+            <RecordPlayer/>
           </View>
         </View>
       )
@@ -570,12 +555,14 @@ class EditMemeScreen extends React.Component {
     return (
       <View style={{flex: 1, backgroundColor: '#000000'}}>
         <ScrollView style={styles.container} keyboardShouldPersistTaps="always">
-          <View style={{marginTop: 10}}>
-            <View style={styles.newStyle}>
-              <Text style={styles.textNew}>Tagga un tuo legame</Text>
+          {Platform.OS === 'android' && (
+            <View style={{marginTop: 10}}>
+              <View style={styles.newStyle}>
+                <Text style={styles.textNew}>Tagga un tuo legame</Text>
+              </View>
             </View>
-          </View>
-          <View style={{marginTop: 47}} />
+          )}
+          <View style={{marginTop: Platform.OS === 'ios' ? 47 : 25}} />
           <View style={styles.containerAuto}>
             <Autocomplete
               autoCapitalize="none"
@@ -588,11 +575,10 @@ class EditMemeScreen extends React.Component {
               defaultValue={query}
               onChangeText={this.autoCompleteTextController}
               placeholder="Tagga un tuo legame"
-              renderItem={(single) => this.renderSearchedItem(single)}
+              renderItem={this.renderSearchedItem}
+              // renderItem={(single) => this.renderSearchedItem(single)}
             />
           </View>
-
-          {selectedUser.length > 0 && <View style={{marginTop: 15}} />}
 
           {selectedUser.length > 0 ? this.renderUsers() : <View />}
 

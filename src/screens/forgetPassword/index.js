@@ -5,11 +5,8 @@ import {
   View,
   TouchableOpacity,
   Dimensions,
-  Image,
-  StyleSheet,
   StatusBar,
   Alert,
-  Button,
   Platform
 } from 'react-native';
 import styles from './styles';

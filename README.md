@@ -1,3 +1,11 @@
+## AUDIO TESTING 
+https://mammuts.it/vocal/audio/commento_02ub1clxr.wav  656
+https://mammuts.it/vocal/audio/commento_2gx61e8ym.wav  904
+https://mammuts.it/vocal/audio/commento_3ov1kc3k6.wav  1.5
+https://mammuts.it/vocal/audio/commento_55ygxeuu9.wav  1.46
+https://mammuts.it/vocal/audio/E2jj06VM9hf1yVHC8jSI4duZXb9EovgamMuEGBKz.aac  76.77
+https://mammuts.it/vocal/audio/YyJYCY53KWyPfELvqoJkkHmoyqSSPSFb5PLWvzaA.aac  90
+
 ### TO RUN ON ANDROID
 JUST RUN 
 - chsh -s /bin/bash
@@ -5,7 +13,28 @@ JUST RUN
 - react-native run-android
 
 
+## react-native-unimodules
+Installing EXConstants (9.3.5)
+Installing EXFileSystem (9.3.0)
+Installing EXImageLoader (1.3.0)
+Installing EXPermissions (10.0.0)
+Installing UMAppLoader (1.4.0)
+Installing UMBarCodeScannerInterface (5.4.0)
+Installing UMCameraInterface (5.4.0)
+Installing UMConstantsInterface (5.4.0)
+Installing UMCore (6.0.0)
+Installing UMFaceDetectorInterface (5.4.0)
+Installing UMFileSystemInterface (5.4.0)
+Installing UMFontInterface (5.4.0)
+Installing UMImageLoaderInterface (5.4.0)
+Installing UMPermissionsInterface (5.4.0)
+Installing UMReactNativeAdapter (5.7.0)
+Installing UMSensorsInterface (5.4.0)
+Installing UMTaskManagerInterface (5.4.0)
+
+### COMMANDS
 react-native start --reset-cache
+npm install --save expo-av
 
 ## UPDATE
 Create OtherStoryScreen for showing other people's stories under of course ProfileStack Screen. 'Remove or add ties' would be good. AND SearchStackScreen also

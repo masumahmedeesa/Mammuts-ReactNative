@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/Feather'
 import ImageGod from '../../components/ImageGod'
 import styles from './styles'
 import SoundPlayer from './SoundPlayer'
+// import ExpoPlayer from '../expo/ExpoPlayer'
 import {showLoading, hideLoading} from '../../store/actions/supportActions'
 
 class EachPost extends React.Component {
@@ -106,6 +107,7 @@ class EachPost extends React.Component {
               ) : comments.audio ? (
                 <View style={{paddingTop: 2, paddingBottom: 2}}>
                   {obj.url && <SoundPlayer soundInfo={obj} />}
+                  {/* {obj.url && <ExpoPlayer soundInfo={obj} />} */}
                 </View>
               ) : (
                 <Text style={{color: 'silver'}}>
@@ -243,7 +245,7 @@ class EachPost extends React.Component {
               images: images,
               data: data,
               user: parsedUser,
-              sender: 'Profile'
+              sender: 'Profile',
               // navigation: navigation,
             })
           }>
@@ -260,10 +262,7 @@ class EachPost extends React.Component {
                 </Text>
 
                 {bondnames === 'Logged user' ? (
-                  <TouchableOpacity
-                    style={{paddingLeft: 5}}
-                    // onPress={() => navigation.navigate('Profile')}
-                  >
+                  <TouchableOpacity style={{paddingLeft: 5}}>
                     <Text
                       style={{
                         fontSize: 14,
@@ -323,15 +322,13 @@ class EachPost extends React.Component {
                     </Text>
                   ) : (
                     <TouchableOpacity
-                      onPress={
-                        () => {
-                          if (parsedUser.id == ownerId) {
-                            // navigation.navigate('Profile')
-                          } else {
-                            navigation.navigate('Individual', {user: ownerInfo})
-                          }
+                      onPress={() => {
+                        if (parsedUser.id == ownerId) {
+                          // navigation.navigate('Profile')
+                        } else {
+                          navigation.navigate('Individual', {user: ownerInfo})
                         }
-                      }>
+                      }}>
                       <Text
                         style={{
                           fontSize: 15,
@@ -357,32 +354,42 @@ class EachPost extends React.Component {
               </View>
             </View>
 
-            <View style={{flexDirection: 'row', paddingTop: 9}}>
-              <Icon
-                name="map-pin"
-                color="rgb(0,184,249)"
-                style={{fontSize: 18}}
-              />
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: '400',
-                  color: 'silver',
-                  marginLeft: 5,
-                }}>
-                {name}
-              </Text>
-            </View>
+            {name ? (
+              <View style={{flexDirection: 'row', paddingTop: 9}}>
+                <Icon
+                  name="map-pin"
+                  color="rgb(0,184,249)"
+                  style={{fontSize: 18}}
+                />
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: '400',
+                    color: 'silver',
+                    marginLeft: 5,
+                  }}>
+                  {name}
+                </Text>
+              </View>
+            ) : (
+              <View />
+            )}
 
-            <View
-              style={{
-                paddingLeft: 2,
-                paddingTop: 8,
-                paddingBottom: 8,
-                flex: 1,
-              }}>
-              <Text style={{fontSize: 14, color: 'white'}}>{description}</Text>
-            </View>
+            {description ? (
+              <View
+                style={{
+                  paddingLeft: 2,
+                  paddingTop: 8,
+                  paddingBottom: 8,
+                  flex: 1,
+                }}>
+                <Text style={{fontSize: 14, color: 'white'}}>
+                  {description}
+                </Text>
+              </View>
+            ) : (
+              <View />
+            )}
 
             {soundIsExist.length > 0 && (
               <View style={{paddingTop: 6, paddingBottom: 6}}>
