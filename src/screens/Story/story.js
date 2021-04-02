@@ -114,7 +114,7 @@ class StoryScreen extends React.Component {
                   imageUrl={
                     single.user.image_profile
                       ? 'https://mammuts.it/' + single.user.image_profile
-                      : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                      : 'https://mammuts.it/upload/profile/logo2.jpg'
                   }
                   borderRadius={50}
                 />
@@ -240,7 +240,7 @@ class StoryScreen extends React.Component {
                 imageUrl={
                   single
                     ? single
-                    : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                    : 'https://mammuts.it/upload/profile/logo2.jpg'
                 }
                 borderRadius={0}
               />
@@ -417,8 +417,8 @@ class StoryScreen extends React.Component {
     const {navigation} = this.props
     const {sender} = this.props.route.params
     Alert.alert(
-      'Warning!',
-      'Sei sicuro di cancellare questa memoria?',
+      'Attenzione!',
+      'Sei sicuro di volere cancellare questa ricordo?',
       [
         {text: 'Cancel', style: 'cancel'},
         {
@@ -512,7 +512,7 @@ class StoryScreen extends React.Component {
                   imageUrl={
                     parsedUser.image_profile
                       ? 'https://mammuts.it/' + parsedUser.image_profile
-                      : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                      : 'https://mammuts.it/upload/profile/logo2.jpg'
                   }
                   borderRadius={50}
                 />
@@ -523,7 +523,7 @@ class StoryScreen extends React.Component {
                   imageUrl={
                     ownerInfo.image_profile
                       ? 'https://mammuts.it/' + ownerInfo.image_profile
-                      : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                      : 'https://mammuts.it/upload/profile/logo2.jpg'
                   }
                   borderRadius={50}
                 />
@@ -769,7 +769,7 @@ class StoryScreen extends React.Component {
                   alignItems: 'center',
                 }}>
                 <Text style={{fontSize: 18, color: 'white'}}>
-                  Oppure registra iun audio
+                  Oppure registra un audio
                 </Text>
                 <Icon
                   name="mic"

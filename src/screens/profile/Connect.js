@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, Text, TouchableOpacity, Alert} from 'react-native'
+import {View, Text, TouchableOpacity, Alert, ScrollView} from 'react-native'
 import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/Feather'
 // import Icon from 'react-native-vector-icons/Feather'
@@ -48,7 +48,6 @@ class Connect extends React.Component {
               navigation.navigate('Individual', {user: item})
             }
           }}
-
           style={{flex: 8}}>
           <View style={{flexDirection: 'row'}}>
             <View style={{flex: 1, paddingRight: 5}}>
@@ -58,14 +57,20 @@ class Connect extends React.Component {
                 imageUrl={
                   image_profile
                     ? 'https://mammuts.it/' + image_profile
-                    : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                    : 'https://mammuts.it/upload/profile/logo2.jpg'
                 }
                 borderRadius={50}
               />
             </View>
-            <View style={{flex: 6, paddingTop: 3, paddingLeft: 4}}>
-              <Text style={styles.normalText}>{nome + ' ' + cognome}</Text>
-              <Text style={styles.normalText}>{email}</Text>
+            <View style={{flex: 6, paddingTop: 3, paddingLeft: 10}}>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  // alignItems: 'center',
+                }}>
+                <Text style={styles.normalText}>{nome + ' ' + cognome}</Text>
+              </View>
             </View>
           </View>
         </TouchableOpacity>
@@ -81,15 +86,19 @@ class Connect extends React.Component {
 
   render() {
     const {legami} = this.props
+    // console.log(legami.length, 'fdfg')
     if (legami && legami.length > 0) {
       return (
         <View style={{padding: 8}}>
-          {legami.map((single) => {
-            return (
-              <View key={single.id}>{this.renderIndividualPeople(single)}</View>
-            )
-          })}
-
+          <ScrollView>
+            {legami.map((single) => {
+              return (
+                <View key={single.id}>
+                  {this.renderIndividualPeople(single)}
+                </View>
+              )
+            })}
+          </ScrollView>
           <View style={{marginBottom: 20}} />
         </View>
       )
@@ -122,7 +131,7 @@ class Connect extends React.Component {
 function mapStateToProps(state) {
   return {
     legami: state.posts.legami,
-    otherLevel: state.auth.user
+    otherLevel: state.auth.user,
   }
 }
 

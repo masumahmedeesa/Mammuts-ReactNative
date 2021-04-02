@@ -9,7 +9,7 @@ import {
   SafeAreaView,
 } from 'react-native'
 import {Player} from '@react-native-community/audio-toolkit'
-import Slider from '@react-native-community/slider'
+// import Slider from '@react-native-community/slider'
 import Icon from 'react-native-vector-icons/Feather'
 import {connect} from 'react-redux'
 

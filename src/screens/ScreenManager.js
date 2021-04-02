@@ -1,5 +1,5 @@
 import React from 'react'
-import {Image, View, Text, Alert, Platform} from 'react-native'
+import {Image, View, Text, Dimensions, Platform} from 'react-native'
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs'
 import {createStackNavigator} from '@react-navigation/stack'
 import Icon from 'react-native-vector-icons/Feather'
@@ -86,6 +86,8 @@ const ScreenManager = () => (
 
 export default ScreenManager
 
+const screenWidth = Dimensions.get('screen').width
+
 const HomeStackScreen = ({navigation}) => (
   <HomeStack.Navigator
     screenOptions={{
@@ -107,14 +109,15 @@ const HomeStackScreen = ({navigation}) => (
       component={HomeScreen}
       options={{
         headerTitle: () => (
-          <Animatable.View animation="bounce" style={{alignItems: 'center'}}>
+          // style={{alignItems: 'center'}}
+          <Animatable.View animation="bounce" style={{paddingLeft: screenWidth*0.28}}>
             <Image
               source={require('../../assets/images/front.png')}
               style={{
                 width: 60,
                 height: 30,
                 tintColor: 'rgb(0,184,249)',
-                padding: 2,
+                // padding: 2,
               }}
               resizeMode="contain"
             />

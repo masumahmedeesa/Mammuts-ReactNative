@@ -8,6 +8,16 @@ export default {
     paddingVertical: 10,
     paddingHorizontal: 10,
   },
+  forCalendar: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+    backgroundColor: '#4c4c4c',
+    borderRadius: 10,
+    padding: 5,
+  },
   addBox: {
     flex: 2,
     backgroundColor: '#323232',
@@ -76,7 +86,7 @@ export default {
     padding: 6,
   },
   cardTwo: {
-    backgroundColor: 'lightslategrey',
+    backgroundColor: '#4c4c4c',
     borderRadius: 8,
     padding: 6,
   },

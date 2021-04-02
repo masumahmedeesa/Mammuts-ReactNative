@@ -8,6 +8,7 @@ import {
   Alert,
   Dimensions,
   RefreshControl,
+  SafeAreaView
 } from 'react-native'
 import Axios from 'axios'
 import {useNavigation} from '@react-navigation/native'
@@ -17,11 +18,19 @@ import ImageGod from '../../components/ImageGod'
 import {URLS} from '../../config/urls'
 import styles from './styles'
 import * as Animatable from 'react-native-animatable'
+import Icon from 'react-native-vector-icons/Feather'
+import EachPost from './EachPost'
 import Connect from './Connect'
 import Post from './Post'
-import {ricodioActions, legamiCollection, refreshPosts} from '../../store/actions/postActions'
+import {
+  ricodioActions,
+  legamiCollection,
+  refreshPosts,
+  sortByMonthPaging
+} from '../../store/actions/postActions'
 import {updateAction} from '../../store/actions/authActions'
 import {showLoading, hideLoading} from '../../store/actions/supportActions'
+import ModalForSorting from '../../components/ModalForSorting'
 
 class ProfileScreen extends React.Component {
   constructor(props) {
@@ -29,22 +38,41 @@ class ProfileScreen extends React.Component {
     this.state = {
       tabView: 'post',
       refreshing: false,
+      page: 1,
+      modalVisible: false,
     }
     this.selectImage = this.selectImage.bind(this)
   }
 
-  // componentDidMount() {
-  //   const user = JSON.parse(this.props.auth.user)
-  //   this.props.showLoading()
-  //   if (user) {
-  //     // this.props.ricodioActions(user.id, 1)
-  //     this.props.legamiCollection(user.id)
-  //   }
-  //   this.props.hideLoading()
-  // }
+  componentDidUpdate(prevProps, prevState) {
+    let {page} = this.state
+    if (prevState.page !== page) {
+      const user = JSON.parse(this.props.auth.user)
+      const {posts} = this.props
+      this.props.showLoading()
+      if (user) {
+        if (posts.singleMonth) {
+          // console.log(this.state.page, posts.singleMonth)
+          this.props.sortByMonthPaging(user.id, posts.singleMonth, page, user)
+        } else {
+          this.props.ricodioActions(user.id, page, user)
+        }
+      }
+      this.props.hideLoading()
+    }
+  }
+
+  setPageOk = () => {
+    // console.log('eikhane ashse from posts')
+    this.setState({page: 1})
+  }
+
+  toggleModal = () => {
+    this.setState({modalVisible: !this.state.modalVisible})
+  }
 
   handleRefresh = () => {
-    // this.setState({refreshing: true})
+    this.setState({page: 1})
     this.props.refreshPosts()
     const user = JSON.parse(this.props.auth.user)
     this.props.showLoading()
@@ -53,7 +81,6 @@ class ProfileScreen extends React.Component {
       this.props.ricodioActions(user.id, 1, user)
     }
     this.props.hideLoading()
-    // this.setState({refreshing: false})
   }
 
   selectImageOption = () => {
@@ -77,11 +104,6 @@ class ProfileScreen extends React.Component {
     })
     return response.data
   }
-
-  // removeData = async (imageName) => {
-  //   const response = await Axios.get(URLS.REMOVE_PROFILE_PICTURE + imageName)
-  //   return response.data
-  // }
 
   selectImage(method) {
     ImagePicker[method]({
@@ -153,20 +175,6 @@ class ProfileScreen extends React.Component {
             }
             borderRadius={10}
           />
-          {/* <Image
-            source={
-              profileImage
-                ? {uri: profileImage}
-                : require('../../../assets/images/logo2.jpg')
-            }
-            style={{
-              width: screenWidth * 0.94,
-              height: screenHeight * 0.42,
-              borderRadius: 10,
-            }}
-            // onLoadStart={() => this.props.showLoading()}
-            // onLoadEnd={() => this.props.hideLoading()}
-          /> */}
         </Animatable.View>
       </View>
     )
@@ -179,12 +187,76 @@ class ProfileScreen extends React.Component {
     this.setState({tabView: 'connect'})
   }
 
+  ggTT = () => {
+    this.setState({page: this.state.page + 1})
+  }
+
+  renderPosts = () => {
+    const {navigation} = this.props
+    const posts = this.props.posts.structuredData
+    const user = this.props.auth.user
+
+    if (posts && posts.length > 0) {
+      return (
+        <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
+          {posts.map((single) => {
+            // 8 miliseconds
+            const {pictures, id} = single.data
+            let dd = Date.now() + id
+            return (
+              <View key={dd}>
+                <EachPost
+                  data={single.data}
+                  images={pictures}
+                  user={JSON.parse(user)}
+                  navigation={navigation}
+                />
+              </View>
+            )
+          })}
+
+          {posts && posts.length > 0 && (
+            <View style={{paddingTop: 8, paddingBottom: 10}}>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: 'rgb(0,184,249)',
+                  borderRadius: 5,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: 5,
+                }}
+                onPress={this.ggTT}>
+                <Text style={{color: 'white'}}>LOAD MORE</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </SafeAreaView>
+      )
+    } else {
+      return (
+        <View style={{flex: 1, backgroundColor: '#000000'}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              padding: 20,
+              justifyContent: 'center',
+            }}>
+            <Icon name="frown" color="silver" style={{fontSize: 36}} />
+            <Text style={{color: 'silver', fontSize: 21, paddingLeft: 8}}>
+              Non hai ancora caricato alcun ricordo.
+            </Text>
+          </View>
+        </View>
+      )
+    }
+  }
+
   render() {
     const {navigation, auth, posts} = this.props
     const user = JSON.parse(auth.user)
 
-    const {tabView, refreshing} = this.state
-
+    const {tabView, refreshing, modalVisible} = this.state
+    // console.log(this.state.page,'ProfileScreen')
     return (
       <View style={{flex: 1, backgroundColor: '#000000'}}>
         <StatusBar barStyle="light-content" />
@@ -220,23 +292,35 @@ class ProfileScreen extends React.Component {
               {marginTop: 10, marginLeft: 10, marginRight: 10},
             ]}
             onPress={this.selectImageOption}>
-            <Text style={{textAlign: 'center', fontSize: 16}}>
+            <Text style={{textAlign: 'center', fontSize: 16, color: 'silver'}}>
               Modifica L'immagine Profilo
             </Text>
           </TouchableOpacity>
 
-          {/* <View style={{marginTop: 14}}>
-            <View style={styles.newTabView}>
-              <Text style={{color: 'white', fontSize: 16, textAlign: 'center'}}>
-                Ricordi
+          <TouchableOpacity
+            style={{marginLeft: 10, marginRight: 10}}
+            onPress={this.toggleModal}>
+            <View style={styles.forCalendar}>
+              <Icon name="filter" size={22} color="rgb(0,184,249)" />
+              <Text
+                style={{
+                  color: 'silver',
+                  fontSize: 18,
+                  marginLeft: 5,
+                  // marginTop: 1,
+                  textAlign: 'center',
+                }}>
+                {posts.singleMonth ? posts.singleMonth : 'Cerca per mese'}
               </Text>
             </View>
-            <View style={{backgroundColor: '#000000', flex: 1}}>
-              <View style={{marginTop: 15, flex: 1}}>
-                {this.renderRicordo(posts.posts)}
-              </View>
-            </View>
-          </View> */}
+          </TouchableOpacity>
+
+          <ModalForSorting
+            data={posts.months}
+            setPageOk={this.setPageOk}
+            modalVisible={modalVisible}
+            onPress={this.toggleModal}
+          />
 
           <View style={{marginTop: 15}}>
             <View style={{flexDirection: 'row'}}>
@@ -266,7 +350,7 @@ class ProfileScreen extends React.Component {
             </View>
 
             {tabView === 'post' ? (
-              <Post navigation={navigation} posts={posts.structuredData} />
+              this.renderPosts()
             ) : tabView === 'connect' ? (
               <Connect navigation={navigation} />
             ) : // legami={posts.legami}
@@ -294,8 +378,11 @@ export default connect(mapStateToProps, {
   hideLoading,
   updateAction,
   legamiCollection,
-  refreshPosts
+  refreshPosts,
+  sortByMonthPaging
 })(ProfileScreenFunction)
+
+// <Post navigation={navigation} posts={posts.structuredData} setPageOk={this.setPageOk}/>
 
 // dataClassifier(single) {
 //   const {auth} = this.props

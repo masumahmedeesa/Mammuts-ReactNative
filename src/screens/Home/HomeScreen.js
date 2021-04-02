@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/Feather'
 import * as Animatable from 'react-native-animatable'
 
 // import ToolkitPlayer from '../expo/ToolkitPlayer'
-import {ricodioActions, legamiCollection} from '../../store/actions/postActions'
+import {ricodioActions, legamiCollection, monthsCollection} from '../../store/actions/postActions'
 import {showLoading, hideLoading} from '../../store/actions/supportActions'
 import styles from './styles'
 
@@ -16,6 +16,7 @@ class HomeScreen extends React.Component {
     this.props.showLoading()
     if (user) {
       this.props.legamiCollection(user.id)
+      this.props.monthsCollection(user.id)
       this.props.ricodioActions(user.id, 1, user)
     }
     this.props.hideLoading()
@@ -133,7 +134,7 @@ class HomeScreen extends React.Component {
           <View
             style={[
               styles.cardTwo,
-              {marginTop: 15, flex: 1, alignItems: 'center'},
+              {marginTop: 15, marginBottom: 20, flex: 1, alignItems: 'center'},
             ]}>
             <Icon
               name="archive"
@@ -234,4 +235,5 @@ export default connect(mapStateToProps, {
   showLoading,
   hideLoading,
   legamiCollection,
+  monthsCollection
 })(HomeScreenFunction)

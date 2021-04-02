@@ -27,22 +27,20 @@ class SigninScreen extends React.Component {
       secureTextEntry: true,
       isValidUser: true,
       isValidPassword: true,
-      error: ""
+      error: '',
     }
   }
 
-	static getDerivedStateFromProps(nextProps, prevState) {
-		if (
-			JSON.stringify(
-				nextProps.auth.error !== JSON.stringify(prevState.error)
-			)
-		) {
-			return {
-				error: nextProps.auth.error,
-			}
-		}
-		return null
-	}
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (
+      JSON.stringify(nextProps.auth.error !== JSON.stringify(prevState.error))
+    ) {
+      return {
+        error: nextProps.auth.error,
+      }
+    }
+    return null
+  }
 
   // const {signIn} = React.useContext(AuthContext);
 
@@ -124,14 +122,14 @@ class SigninScreen extends React.Component {
     // console.log(email, password)
 
     this.props.showLoading()
-    this.props.loginAction(
-      {
-        email,
-        password,
-        // loginType: 'normal',
-      },
-    )
-    this.props.hideLoading()
+    this.props.loginAction({
+      email,
+      password,
+      // loginType: 'normal',
+    })
+    setTimeout(() => {
+      this.props.hideLoading()
+    }, 1300)
   }
 
   render() {
@@ -145,7 +143,7 @@ class SigninScreen extends React.Component {
       secureTextEntry,
       isValidUser,
       isValidPassword,
-      error
+      error,
     } = this.state
     // console.log(error)
     return (
@@ -163,8 +161,12 @@ class SigninScreen extends React.Component {
         <Animatable.View animation="fadeInUpBig" style={styles.footer}>
           {/* {error.email && <View style={styles.errorBox}><Text>{error.email}</Text></View>} */}
           {/* {error.password && <View style={styles.errorBox}><Text>{error.password}</Text></View>} */}
-          {error.length > 0 && <View style={styles.errorBox}><Text>{error}</Text></View>}
-          
+          {error.length > 0 && (
+            <View style={styles.errorBox}>
+              <Text>{error}</Text>
+            </View>
+          )}
+
           <Text style={styles.text_footer}> E-mail </Text>
           <View style={styles.action}>
             <Feather name="at-sign" size={22} color="yellow" />

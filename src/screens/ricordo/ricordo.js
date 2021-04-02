@@ -8,13 +8,22 @@ import {
   FlatList,
   SafeAreaView,
   ActivityIndicator,
+  StyleSheet,
+  TouchableOpacity,
 } from 'react-native'
 import {useNavigation} from '@react-navigation/native'
 import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/Feather'
-import {ricodioActions, refreshPosts, legamiCollection} from '../../store/actions/postActions'
+import {
+  ricodioActions,
+  refreshPosts,
+  legamiCollection,
+  monthsCollection,
+  sortByMonthPaging,
+} from '../../store/actions/postActions'
 import {showLoading, hideLoading} from '../../store/actions/supportActions'
 import ImageGod from '../../components/ImageGod'
+import ModalForSorting from '../../components/ModalForSorting'
 
 class RicordoScreen extends React.Component {
   constructor(props) {
@@ -23,19 +32,43 @@ class RicordoScreen extends React.Component {
       page: 1,
       imageLoading: false,
       onRefreshing: false,
+      modalVisible: false,
     }
   }
+
+  // componentDidMount() {
+  //   const user = JSON.parse(this.props.auth.user)
+  //   this.props.showLoading()
+  //   if (user) {
+  //     this.props.monthsCollection(user.id)
+  //   }
+  //   this.props.hideLoading()
+  // }
 
   componentDidUpdate(prevProps, prevState) {
     let {page} = this.state
     if (prevState.page !== page) {
       const user = JSON.parse(this.props.auth.user)
+      const {posts} = this.props
       this.props.showLoading()
       if (user) {
-        this.props.ricodioActions(user.id, page, user)
+        if (posts.singleMonth) {
+          // console.log(this.state.page,'dfwiwi bwbubuwbub')
+          this.props.sortByMonthPaging(user.id, posts.singleMonth, page, user)
+        } else {
+          this.props.ricodioActions(user.id, page, user)
+        }
       }
       this.props.hideLoading()
     }
+  }
+
+  setPageOk = () => {
+    this.setState({page: 1})
+  }
+
+  toggleModal = () => {
+    this.setState({modalVisible: !this.state.modalVisible})
   }
 
   ggTT = () => {
@@ -92,7 +125,7 @@ class RicordoScreen extends React.Component {
   }
 
   handleRefresh = () => {
-    // this.setState({onRefreshing: true})
+    this.setState({page: 1})
     this.props.refreshPosts()
     const user = JSON.parse(this.props.auth.user)
     this.props.showLoading()
@@ -106,12 +139,37 @@ class RicordoScreen extends React.Component {
 
   render() {
     const {posts} = this.props
-    // console.log(this.state.onRefreshing)
+    const {modalVisible} = this.state
+    // console.log(page,'ricordo')
     if (posts.renderingImages && posts.renderingImages.length > 0) {
       return (
         <View style={{flex: 1, backgroundColor: '#000000'}}>
           <StatusBar barStyle="light-content" />
           <SafeAreaView style={{width: '100%'}}>
+
+            <TouchableOpacity onPress={this.toggleModal}>
+              <View style={styles.forCalendar}>
+                <Icon name="filter" size={22} color="rgb(0,184,249)" />
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 18,
+                    marginLeft: 5,
+                    // marginTop: 1,
+                    textAlign: 'center',
+                  }}>
+                  {posts.singleMonth ? posts.singleMonth : 'Cerca per mese'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <ModalForSorting
+              data={posts.months}
+              setPageOk={this.setPageOk}
+              modalVisible={modalVisible}
+              onPress={this.toggleModal}
+            />
+
             <FlatList
               style={{width: '100%'}}
               keyExtractor={(item, index) => index}
@@ -163,8 +221,23 @@ export default connect(mapStateToProps, {
   refreshPosts,
   showLoading,
   hideLoading,
-  legamiCollection
+  legamiCollection,
+  monthsCollection,
+  sortByMonthPaging
 })(Ricordo)
+
+const styles = StyleSheet.create({
+  forCalendar: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+    backgroundColor: '#4c4c4c',
+    borderRadius: 10,
+    padding: 5,
+  },
+})
 
 /* <FastImage
   style={{width, height: this.state.height}}

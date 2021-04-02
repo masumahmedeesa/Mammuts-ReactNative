@@ -10,7 +10,7 @@ export const ricodioActions = (userId, page, parsedUser) => (dispatch) => {
         type: Types.GET_POST,
         payload: {
           posts: response.data,
-          parsedUser: parsedUser
+          parsedUser: parsedUser,
           // total: response.data.total,
         },
       })
@@ -30,7 +30,7 @@ export const ricodioActions = (userId, page, parsedUser) => (dispatch) => {
 
 export const legamiCollection = (id) => (dispatch) => {
   // console.log(URLS.LEGAMI_PERSONAL+id)
-  Axios.get(URLS.LEGAMI_PERSONAL+id)
+  Axios.get(URLS.LEGAMI_PERSONAL + id)
     .then((response) => {
       dispatch({
         type: Types.LEGAMI_PERSONAL,
@@ -72,7 +72,7 @@ export const postCreate = (data, parsedUserUpload) => (dispatch) => {
     type: Types.UPLOAD_POST,
     payload: {
       createdData: data,
-      parsedUserUpload: parsedUserUpload
+      parsedUserUpload: parsedUserUpload,
     },
   })
 }
@@ -90,9 +90,13 @@ export const postDelete = (id) => (dispatch) => {
     .catch((error) => console.log(error, 'postDelete actions'))
 }
 
-export const postUpdate = (data, commentLength, commentUsers, comments, parsedUserUpdate) => (
-  dispatch,
-) => {
+export const postUpdate = (
+  data,
+  commentLength,
+  commentUsers,
+  comments,
+  parsedUserUpdate,
+) => (dispatch) => {
   data['commentLength'] = commentLength
   data['commentUsers'] = commentUsers
   data['comments'] = comments
@@ -100,13 +104,72 @@ export const postUpdate = (data, commentLength, commentUsers, comments, parsedUs
     type: Types.EDIT_POST,
     payload: {
       editedPost: data,
-      parsedUserUpdate: parsedUserUpdate
+      parsedUserUpdate: parsedUserUpdate,
     },
+  })
+}
+
+export const monthsCollection = (userId) => (dispatch) => {
+  Axios.get(URLS.MONTH_COLLECTION + `${userId}`)
+    .then((response) => {
+      // console.log(response.data,'actions')
+      dispatch({
+        type: Types.MONTH_COLLECTION,
+        payload: {
+          months: response.data,
+        },
+      })
+    })
+    .catch((error) => {
+      console.log(error, 'error in monthsCollection')
+    })
+}
+
+export const sortByMonth = (userId, month, page, parsedUser) => (dispatch) => {
+  Axios.get(URLS.SORT_BY_MONTH + `${userId}/${month}?page=${page}`)
+    .then((response) => {
+      // console.log(response.data,'actions')
+      dispatch({
+        type: Types.SORT_BY_MONTH,
+        payload: {
+          posts: response.data,
+          parsedUser: parsedUser
+        },
+      })
+    })
+    .catch((error) => {
+      console.log(error, 'error in sortByMonth')
+    })
+}
+
+export const sortByMonthPaging = (userId, month, page, parsedUser) => (dispatch) => {
+  Axios.get(URLS.SORT_BY_MONTH + `${userId}/${month}?page=${page}`)
+    .then((response) => {
+      // console.log(response.data,'actions')
+      dispatch({
+        type: Types.SORT_BY_MONTH_PAGING,
+        payload: {
+          posts: response.data,
+          parsedUser: parsedUser
+        },
+      })
+    })
+    .catch((error) => {
+      console.log(error, 'error in sortByMonth')
+    })
+}
+
+export const selectSingleMonth = (month) => (dispatch) => {
+  dispatch({
+    type: Types.SINGLE_MONTH,
+    payload: {
+      month: month
+    }
   })
 }
 
 export const refreshPosts = () => (dispatch) => {
   dispatch({
-    type: Types.REFRESH_POSTS
+    type: Types.REFRESH_POSTS,
   })
 }

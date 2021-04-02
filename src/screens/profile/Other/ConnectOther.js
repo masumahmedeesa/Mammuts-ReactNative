@@ -92,21 +92,27 @@ class ConnectOther extends React.Component {
                 imageUrl={
                   image_profile
                     ? 'https://mammuts.it/' + image_profile
-                    : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                    : 'https://mammuts.it/upload/profile/logo2.jpg'
                 }
                 borderRadius={50}
               />
             </View>
-            <View style={{flex: 6, paddingTop: 3, paddingLeft: 5}}>
-              <Text style={styles.normalText}>{nome + ' ' + cognome}</Text>
-              <Text style={styles.normalText}>{email}</Text>
+            <View style={{flex: 6, paddingTop: 3, paddingLeft: 10}}>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  // alignItems: 'center',
+                }}>
+                <Text style={styles.normalText}>{nome + ' ' + cognome}</Text>
+              </View>
             </View>
           </View>
         </TouchableOpacity>
 
         {flag ? (
           legamiView
-        ) : (
+        ) : parsedLevel.id != item.id && (
           <TouchableOpacity
             onPress={() => this.addLegami(item.cf_key)}
             style={styles.addBox}>

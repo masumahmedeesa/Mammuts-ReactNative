@@ -111,9 +111,9 @@ class OtherClass extends React.Component {
               </Text>
             </View>
 
-            <Text style={{fontSize: 16, fontWeight: '600', color: 'silver'}}>
+            {/* <Text style={{fontSize: 16, fontWeight: '600', color: 'silver'}}>
               {user.email}
-            </Text>
+            </Text> */}
           </View>
 
           <View style={{marginTop: 15}}>

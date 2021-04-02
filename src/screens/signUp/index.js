@@ -325,7 +325,10 @@ class SignupScreenClass extends React.Component {
       deceduto: 0,
       notifiche: 0,
     })
-    this.props.hideLoading()
+    setTimeout(() => {
+      this.props.hideLoading()
+    }, 1600)
+    // this.props.hideLoading()
   }
 
   render() {

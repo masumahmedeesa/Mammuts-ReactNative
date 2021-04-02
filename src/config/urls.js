@@ -13,6 +13,9 @@ export const URLS = {
   STORIES: PREFIX + 'storiesPerson/',
   STORIES_OTHER: PREFIX + 'storiesPersonOther/',
 
+  MONTH_COLLECTION: PREFIX + 'months/',
+  SORT_BY_MONTH: PREFIX + 'storiesPersonByMonth/',
+
   LEGAMI_PERSONAL: PREFIX + 'legami/',
   ALLUSERS: PREFIX + 'allusers',
   LEGAMI_ADD_REMOVE: PREFIX + "legamiAR",

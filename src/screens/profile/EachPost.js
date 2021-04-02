@@ -44,7 +44,7 @@ class EachPost extends React.Component {
               imageUrl={
                 commentUsers.image_profile
                   ? 'https://mammuts.it/' + commentUsers.image_profile
-                  : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                  : 'https://mammuts.it/upload/profile/logo2.jpg'
               }
               borderRadius={50}
             />
@@ -146,7 +146,7 @@ class EachPost extends React.Component {
             imageUrl={
               Pictures[i]
                 ? Pictures[i]
-                : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                : 'https://mammuts.it/upload/profile/logo2.jpg'
             }
             borderRadius={0}
           />
@@ -292,7 +292,7 @@ class EachPost extends React.Component {
                     imageUrl={
                       parsedUser.image_profile
                         ? 'https://mammuts.it/' + parsedUser.image_profile
-                        : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                        : 'https://mammuts.it/upload/profile/logo2.jpg'
                     }
                     borderRadius={50}
                   />
@@ -303,7 +303,7 @@ class EachPost extends React.Component {
                     imageUrl={
                       ownerInfo.image_profile
                         ? 'https://mammuts.it/' + ownerInfo.image_profile
-                        : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                        : 'https://mammuts.it/upload/profile/logo2.jpg'
                     }
                     borderRadius={50}
                   />

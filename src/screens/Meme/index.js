@@ -299,7 +299,7 @@ class MemeScreen extends React.Component {
                       imageUrl={
                         image_profile
                           ? 'https://mammuts.it/' + image_profile
-                          : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                          : 'https://mammuts.it/upload/profile/logo2.jpg'
                       }
                       borderRadius={50}
                     />

@@ -1,17 +1,12 @@
 import React from 'react'
-import {
-  View,
-  Text,
-  SafeAreaView,
-  TouchableOpacity
-} from 'react-native'
+import {View, Text, SafeAreaView, TouchableOpacity} from 'react-native'
 // import Axios from 'axios'
 // import {Content} from 'native-base'
 import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/Feather'
 import EachPost from './EachPost'
 // import {URLS} from '../../config/urls'
-import {ricodioActions} from '../../store/actions/postActions'
+import {ricodioActions, sortByMonthPaging} from '../../store/actions/postActions'
 import {showLoading, hideLoading} from '../../store/actions/supportActions'
 // import {TouchableOpacity} from 'react-native-gesture-handler'
 // import localTrack from '../../data/pure.m4a'
@@ -66,9 +61,15 @@ class Post extends React.Component {
     let {page} = this.state
     if (prevState.page !== page) {
       const user = JSON.parse(this.props.user)
+      const {onno} = this.props
       this.props.showLoading()
       if (user) {
-        this.props.ricodioActions(user.id, page, user)
+        if (onno.singleMonth) {
+          // console.log(this.state.page, onno.singleMonth)
+          this.props.sortByMonthPaging(user.id, onno.singleMonth, page, user)
+        } else {
+          this.props.ricodioActions(user.id, page, user)
+        }
       }
       this.props.hideLoading()
     }
@@ -76,10 +77,13 @@ class Post extends React.Component {
 
   ggTT = () => {
     this.setState({page: this.state.page + 1})
+    const {setPageOk} = this.props
+    setPageOk()
   }
 
   render() {
-    const {navigation, posts, user} = this.props
+    const {navigation, posts, user, onno} = this.props
+    // console.log(this.state.page, onno.singleMonth)
     if (posts && posts.length > 0) {
       return (
         <SafeAreaView style={{flex: 1, backgroundColor: '#000000'}}>
@@ -93,17 +97,6 @@ class Post extends React.Component {
                   data={single.data}
                   images={pictures}
                   user={JSON.parse(user)}
-                  // soundInfo={obj}
-                  // soundIsExist={single.audio}
-                  // published={single.data_inserimento}
-                  // name={single.luogo}
-                  // description={single.testo}
-                  // ownerId={single.id_utente}
-                  // privato={single.privato}
-                  // tags={firstCase ? firstCase : single.tags}
-                  // bondnames={firstCase ? 'Logged user' : single.bondnames}
-                  // ownerInfo={specialCase}
-                  // singlegg={single}
                   navigation={navigation}
                 />
               </View>
@@ -130,7 +123,12 @@ class Post extends React.Component {
     } else {
       return (
         <View style={{flex: 1, backgroundColor: '#000000'}}>
-          <View style={{flexDirection: 'row', padding: 20, justifyContent: 'center'}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              padding: 20,
+              justifyContent: 'center',
+            }}>
             <Icon name="frown" color="silver" style={{fontSize: 36}} />
             <Text style={{color: 'silver', fontSize: 21, paddingLeft: 8}}>
               Non hai ancora caricato alcun ricordo.
@@ -144,7 +142,7 @@ class Post extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    // posts: state.posts.posts,
+    onno: state.posts,
     user: state.auth.user,
   }
 }
@@ -154,6 +152,7 @@ export default connect(mapStateToProps, {
   showLoading,
   hideLoading,
   ricodioActions,
+  sortByMonthPaging
 })(Post)
 
 /* <EachPost

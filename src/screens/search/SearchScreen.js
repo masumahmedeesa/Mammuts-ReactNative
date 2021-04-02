@@ -65,13 +65,18 @@ class SearchScreenClass extends React.Component {
     const {legamies, navigation} = this.props
     const {item} = this.state
     const filteredUsers = this.findUser(item)
+    const user = JSON.parse(this.props.user)
+    
     if (filteredUsers.length > 0) {
       return (
-        <View style={{paddingBottom: 30}}>
+        <View style={{marginBottom: 90}}>
           {filteredUsers.map((single) => {
             const {nome, cognome, email, image_profile} = single
             const dd = Date.now() + single.nome + single.cognome + single.id
             let flag = false
+            if (single.id == user.id){
+              return false
+            }
             const legamiView = legamies.map((l) => {
               if (l.id == single.id) {
                 flag = true
@@ -98,20 +103,27 @@ class SearchScreenClass extends React.Component {
                         imageUrl={
                           image_profile
                             ? 'https://mammuts.it/' + image_profile
-                            : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                            : 'https://mammuts.it/upload/profile/logo2.jpg'
                         }
                         borderRadius={50}
                       />
                     </View>
                     <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate('Individual', {user: single})
-                      }
-                      style={{flex: 6, paddingTop: 3, paddingLeft: 4}}>
-                      <Text style={styles.normalText}>
-                        {nome + ' ' + cognome}
-                      </Text>
-                      <Text style={styles.normalText}>{email}</Text>
+                      onPress={() => {
+                        if (flag)
+                          navigation.navigate('Individual', {user: single})
+                      }}
+                      style={{flex: 6, paddingTop: 3, paddingLeft: 10}}>
+                      <View
+                        style={{
+                          flex: 1,
+                          justifyContent: 'center',
+                          // alignItems: 'center',
+                        }}>
+                        <Text style={styles.normalText}>
+                          {nome + ' ' + cognome}
+                        </Text>
+                      </View>
                     </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
@@ -175,14 +187,18 @@ class SearchScreenClass extends React.Component {
 
   renderUsers = () => {
     const {allusers, legamies, navigation} = this.props
-    // console.log(legamies)
+    const user = JSON.parse(this.props.user)
+
     if (allusers.length > 0) {
       return (
-        <View style={{paddingBottom: 78}}>
+        <View style={{marginBottom: 90}}>
           {allusers.map((single) => {
             const {nome, cognome, email, image_profile} = single
             const dd = Date.now() + single.email + single.id
             let flag = false
+            if (single.id == user.id){
+              return false
+            }
             const legamiView = legamies.map((l) => {
               if (l.id == single.id) {
                 flag = true
@@ -209,20 +225,27 @@ class SearchScreenClass extends React.Component {
                         imageUrl={
                           image_profile
                             ? 'https://mammuts.it/' + image_profile
-                            : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                            : 'https://mammuts.it/upload/profile/logo2.jpg'
                         }
                         borderRadius={50}
                       />
                     </View>
                     <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate('Individual', {user: single})
-                      }
-                      style={{flex: 6, paddingTop: 2, paddingLeft: 4}}>
-                      <Text style={styles.normalText}>
-                        {nome + ' ' + cognome}
-                      </Text>
-                      <Text style={styles.normalText}>{email}</Text>
+                      onPress={() => {
+                        if (flag)
+                          navigation.navigate('Individual', {user: single})
+                      }}
+                      style={{flex: 6, paddingLeft: 10}}>
+                      <View
+                        style={{
+                          flex: 1,
+                          justifyContent: 'center',
+                          // alignItems: 'center',
+                        }}>
+                        <Text style={styles.normalText}>
+                          {nome + ' ' + cognome}
+                        </Text>
+                      </View>
                     </TouchableOpacity>
                   </View>
                 </TouchableOpacity>

@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, StyleSheet, Image, Dimensions, Platform} from 'react-native'
+import {View, StyleSheet, Dimensions, Platform} from 'react-native'
 import {Caption, Drawer, Text} from 'react-native-paper'
 import ImageGod from './ImageGod'
 import Icon from 'react-native-vector-icons/Feather'
@@ -17,7 +17,7 @@ export const DrawerContent = connect(mapStateToProps, {logoutAction})(
     const windowHeight = Dimensions.get('window').height
 
     let imageSource = user.image_profile
-
+    
     return (
       <View style={{flex: 1, backgroundColor: '#000000'}}>
         <DrawerContentScrollView {...props}>

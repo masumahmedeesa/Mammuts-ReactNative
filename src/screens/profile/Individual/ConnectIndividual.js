@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, Text, TouchableOpacity, Alert} from 'react-native'
+import {View, Text, TouchableOpacity, Alert, ScrollView} from 'react-native'
 import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/Feather'
 import {showLoading, hideLoading} from '../../../store/actions/supportActions'
@@ -77,10 +77,9 @@ class ConnectIndividual extends React.Component {
           onPress={() => {
             if (parsedLevel.id == item.id) {
               navigation.navigate('Profile')
-            } else if(user.id == item.id){
+            } else if (user.id == item.id) {
               // do nothing
-            }
-            else {
+            } else {
               navigation.navigate('Other', {user: item})
             }
           }}
@@ -93,43 +92,52 @@ class ConnectIndividual extends React.Component {
                 imageUrl={
                   image_profile
                     ? 'https://mammuts.it/' + image_profile
-                    : 'https://mammuts.it/upload/profile/logo_mammuts.png'
+                    : 'https://mammuts.it/upload/profile/logo2.jpg'
                 }
                 borderRadius={50}
               />
             </View>
-            <View style={{flex: 6, paddingTop: 3, paddingLeft: 5}}>
-              <Text style={styles.normalText}>{nome + ' ' + cognome}</Text>
-              <Text style={styles.normalText}>{email}</Text>
+            <View style={{flex: 6, paddingTop: 3, paddingLeft: 10}}>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  // alignItems: 'center',
+                }}>
+                <Text style={styles.normalText}>{nome + ' ' + cognome}</Text>
+              </View>
             </View>
           </View>
         </TouchableOpacity>
 
-        {flag ? (
-          legamiView
-        ) : (
-          <TouchableOpacity
-            onPress={() => this.addLegami(item.cf_key)}
-            style={styles.addBox}>
-            <Text style={styles.addText}>Aggiungi</Text>
-          </TouchableOpacity>
-        )}
+        {flag
+          ? legamiView
+          : parsedLevel.id != item.id && (
+              <TouchableOpacity
+                onPress={() => this.addLegami(item.cf_key)}
+                style={styles.addBox}>
+                <Text style={styles.addText}>Aggiungi</Text>
+              </TouchableOpacity>
+            )}
       </View>
     )
   }
 
   render() {
     const {legami} = this.props
-    // console.log(legami.length, this.state.count)
+    // console.log(legami.length, legami)
     if (legami && legami.length > 0) {
       return (
         <View style={{padding: 8}}>
-          {legami.map((single) => {
-            return (
-              <View key={single.id}>{this.renderIndividualPeople(single)}</View>
-            )
-          })}
-
+          <ScrollView>
+            {legami.map((single) => {
+              return (
+                <View key={single.id}>
+                  {this.renderIndividualPeople(single)}
+                </View>
+              )
+            })}
+          </ScrollView>
           <View style={{marginBottom: 20}} />
         </View>
       )
@@ -163,7 +171,7 @@ function mapStateToProps(state) {
   return {
     legami: state.individual.legami,
     legamies: state.posts.legami,
-    otherLevel: state.auth.user
+    otherLevel: state.auth.user,
   }
 }
 
